@@ -29,6 +29,11 @@ func ParseConfig(configFile string) (*BotConfig, error) {
 		return nil, err
 	}
 
+	ConfigSettings.SibylUrl, err = cfgContent.Get("general", "sibyl_url")
+	if err != nil {
+		return nil, err
+	}
+
 	if ConfigSettings.SibylToken == "" {
 		return nil, errors.New("sibyl token is empty")
 	}

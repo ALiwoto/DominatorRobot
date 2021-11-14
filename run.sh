@@ -4,9 +4,9 @@ buildApp()
 	# clear the screen (the terminal)
 	clear
 
-	echo -e "building Sibyl System, please wait a bit..."
+	echo -e "building Dominator Bot, please wait a bit..."
 
-	go build -o sibylSystem
+	go build -o botBinary
 }
 
 runApp()
@@ -14,9 +14,9 @@ runApp()
 	# clear the screen (the terminal)
 	clear
 
-	echo -e "we are done building it,\n->now running the Sibyl System...\n-------------------"
+	echo -e "we are done building it,\n->now running the Dominator Bot...\n-------------------"
 
-	./sibylSystem
+	./botBinary
 }
 
 testApp()
