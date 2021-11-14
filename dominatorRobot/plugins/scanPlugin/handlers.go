@@ -33,7 +33,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	force := args.GetAsBool("f", "force", "force-ban")
 	reason := args.GetAsStringOrRaw("r", "reason", "reason")
-	original := args.GetAsBool("o", "original", "origin")
+	original := args.HasFlag("o", "original", "origin")
 
 	if reason == "" {
 		reason = args.GetFirstNoneEmptyValue()
