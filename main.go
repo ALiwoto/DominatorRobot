@@ -20,7 +20,10 @@ func main() {
 		defer f()
 	}
 
-	database.StartDatabase()
+	err = database.StartDatabase()
+	if err != nil {
+		logging.Fatal("Error starting database", err)
+	}
 
 	err = plugins.StartTelegramBot()
 	if err != nil {

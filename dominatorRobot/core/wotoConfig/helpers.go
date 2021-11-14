@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/bigkevmcd/go-configparser"
 )
 
@@ -101,4 +102,19 @@ func DropUpdates() bool {
 
 func GetCmdPrefixes() []rune {
 	return []rune{'/', '!'}
+}
+
+func GetSibylClient() sibyl.SibylClient {
+	return sibyl.NewClient(
+		ConfigSettings.SibylUrl,
+		&sibyl.SibylConfig{
+			HostUrl: ConfigSettings.SibylUrl,
+		},
+	)
+}
+
+func GetSibylConfig() *sibyl.SibylConfig {
+	return &sibyl.SibylConfig{
+		HostUrl: ConfigSettings.SibylUrl,
+	}
 }

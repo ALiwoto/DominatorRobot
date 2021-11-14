@@ -7,7 +7,7 @@ import (
 
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
-	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 )
@@ -38,8 +38,15 @@ func StartTelegramBot() error {
 
 	logging.Info(fmt.Sprintf("%s has started | ID: %d", b.Username, b.Id))
 
-	wotoValues.HelperBot = b
-	wotoValues.BotUpdater = updater
+	wv.HelperBot = b
+	wv.BotUpdater = updater
+	wv.SibylClient = wotoConfig.GetSibylClient()
+
+	if wv.SibylClient == nil {
+		// just to make sure.
+		return errors.New("sibyl client is nil")
+	}
+
 	LoadAllHandlers(updater.Dispatcher, wotoConfig.GetCmdPrefixes())
 
 	updater.Idle()
