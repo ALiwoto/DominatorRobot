@@ -106,7 +106,7 @@ func GetCmdPrefixes() []rune {
 
 func GetSibylClient() sibyl.SibylClient {
 	return sibyl.NewClient(
-		ConfigSettings.SibylUrl,
+		ConfigSettings.SibylToken,
 		&sibyl.SibylConfig{
 			HostUrl: ConfigSettings.SibylUrl,
 		},

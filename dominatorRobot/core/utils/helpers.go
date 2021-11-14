@@ -9,18 +9,21 @@ import (
 func ResolveUser(id int64) *sibyl.TokenInfo {
 	t, err := database.GetTokenFromId(id)
 	if err != nil || t == nil {
-		return nil
+		return GetTokenFromServer(id, true)
 	}
 
-	return GetTokenFromServer(id)
+	return t
 }
 
-func GetTokenFromServer(id int64) *sibyl.TokenInfo {
+func GetTokenFromServer(id int64, cache bool) *sibyl.TokenInfo {
 	t, err := wotoValues.SibylClient.GetToken(id)
 	if err != nil || t == nil {
 		return nil
 	}
 
+	if cache {
+		database.NewToken(t)
+	}
 	return t
 }
 
