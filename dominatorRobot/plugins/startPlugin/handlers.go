@@ -30,7 +30,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	time.Sleep(time.Millisecond * 2500)
+	time.Sleep(sleepTime)
 
 	//"TS No: `{userid}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
 	md = mdparser.GetNormal("TS No: ").AppendMonoThis(strconv.FormatInt(sender, 10))
@@ -50,7 +50,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 			return ext.EndGroups
 		}
 
-		time.Sleep(time.Millisecond * 2500)
+		time.Sleep(sleepTime)
 	}
 
 	var userStatus string
@@ -64,6 +64,16 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	md.AppendBoldThis("\n • Name: ").AppendNormalThis(user.FirstName)
 	md.AppendBoldThis("\n • RD: ").AppendNormalThis("2021-1107-T175741")
 	mdBack = md.AppendBoldThis("\n • Position: ").AppendNormalThis(userStatus)
+
+	topMsg, err = topMsg.EditText(b, mdBack.ToString(), &gotgbot.EditMessageTextOpts{
+		ParseMode: wv.MarkdownV2,
+	})
+	if err != nil || topMsg == nil {
+		return ext.EndGroups
+	}
+
+	time.Sleep(sleepTime)
+
 	md = md.AppendNormal("\n\nAffiliation: Public Safety Bureau, ")
 	md.AppendBoldThis("Criminal Investigation Department")
 
@@ -74,7 +84,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	time.Sleep(time.Millisecond * 2500)
+	time.Sleep(sleepTime)
 
 	md = mdBack.AppendNormalThis("\n\nDominator usage approval Confirmed.")
 	md.AppendNormalThis(" You are a valid user!")
