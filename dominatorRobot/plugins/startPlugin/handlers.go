@@ -12,6 +12,14 @@ import (
 )
 
 func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
+	if registering {
+		return ext.ContinueGroups
+	} else {
+		registering = true
+		defer func() {
+			registering = false
+		}()
+	}
 	user := ctx.EffectiveUser
 	sender := user.Id
 	message := ctx.EffectiveMessage
@@ -19,6 +27,9 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	if !utils.CanScan(u) {
 		return ext.EndGroups
 	}
+
+	wv.RateLimiter.AddCustomIgnore(sender, time.Minute*5, false)
+	defer wv.RateLimiter.RemoveCustomIgnore(sender)
 
 	//"TS No: `{userid}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
 	md := mdparser.GetNormal("Dominator Portable Psychological Diagnosis")

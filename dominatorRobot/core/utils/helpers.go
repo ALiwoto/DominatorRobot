@@ -7,12 +7,7 @@ import (
 )
 
 func ResolveUser(id int64) *sibyl.TokenInfo {
-	t, err := database.GetTokenFromId(id)
-	if err != nil || t == nil {
-		return GetTokenFromServer(id, true)
-	}
-
-	return t
+	return GetTokenFromServer(id, false)
 }
 
 func GetTokenFromServer(id int64, cache bool) *sibyl.TokenInfo {
