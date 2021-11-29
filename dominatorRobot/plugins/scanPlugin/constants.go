@@ -1,5 +1,6 @@
 package scanPlugin
 
 const (
-	ScanCmd = "scan"
+	ScanCmd   = "scan"
+	RevertCmd = "revert"
 )

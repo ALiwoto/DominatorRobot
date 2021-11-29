@@ -3,6 +3,7 @@ package startPlugin
 import "time"
 
 const (
-	dCmd      = "d"
-	sleepTime = 2500 * time.Millisecond
+	DCmd         = "d"
+	DominatorCmd = "dominator"
+	sleepTime    = 2500 * time.Millisecond
 )
