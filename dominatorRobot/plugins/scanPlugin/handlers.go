@@ -43,6 +43,12 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		target = replied.ForwardFrom.Id
 	}
 
+	if force {
+		_, err = wv.SibylClient.Ban(target, reason, replied.Text, "this is source", replied.From.IsBot)
+	} else {
+		_, err = wv.SibylClient.Report(target, reason, replied.Text, "the source", replied.From.IsBot)
+	}
+
 	md := mdparser.GetNormal("Sending a cymatic scan request to Sibyl...")
 	topMsg, err := ctx.EffectiveMessage.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
 		AllowSendingWithoutReply: false,
@@ -53,12 +59,6 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	time.Sleep(time.Millisecond * 600)
-
-	if force {
-		_, err = wv.SibylClient.Ban(target, reason, replied.Text, "this is source", replied.From.IsBot)
-	} else {
-		_, err = wv.SibylClient.Report(target, reason, replied.Text, "the source", replied.From.IsBot)
-	}
 
 	if err != nil {
 		md = mdparser.GetMono(err.Error())
