@@ -23,6 +23,8 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
+	src := ctx.Message.GetLink()
+
 	replied := msg.ReplyToMessage
 	target := replied.From.Id
 
@@ -44,9 +46,14 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	if force {
-		_, err = wv.SibylClient.Ban(target, reason, replied.Text, "this is source", replied.From.IsBot)
+		_, err = wv.SibylClient.Ban(target, reason, replied.Text, src, replied.From.IsBot)
 	} else {
-		_, err = wv.SibylClient.Report(target, reason, replied.Text, "the source", replied.From.IsBot)
+		_, err = wv.SibylClient.Report(target, reason, replied.Text, src, replied.From.IsBot)
+	}
+
+	if err != nil {
+		_ = utils.SendAlertErr(b, msg, err)
+		return ext.EndGroups
 	}
 
 	md := mdparser.GetNormal("Sending a cymatic scan request to Sibyl...")
@@ -61,11 +68,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	time.Sleep(time.Millisecond * 600)
 
 	if err != nil {
-		md = mdparser.GetMono(err.Error())
-		_, _ = ctx.EffectiveMessage.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
-			AllowSendingWithoutReply: false,
-			ParseMode:                wv.MarkdownV2,
-		})
+		_ = utils.SendAlertErr(b, msg, err)
 		return ext.EndGroups
 	}
 
