@@ -48,6 +48,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	text := strings.ReplaceAll(replied.Text, "\r", "")
 	text = strings.ReplaceAll(text, "\n", "\r\n")
+	text = strings.TrimSpace(text)
 
 	if force {
 		_, err = wv.SibylClient.Ban(target, reason, text, src, replied.From.IsBot)
