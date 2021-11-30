@@ -79,3 +79,7 @@ func CanScan(t *sibyl.TokenInfo) bool {
 func CanForceScan(t *sibyl.TokenInfo) bool {
 	return t != nil && t.Permission > 0x1
 }
+
+func CanRevert(t *sibyl.TokenInfo) bool {
+	return t != nil && t.Permission > 0x1
+}
