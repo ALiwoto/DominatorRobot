@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/ALiwoto/mdparser/mdparser"
@@ -15,6 +16,19 @@ import (
 
 func ResolveUser(id int64) *sibyl.TokenInfo {
 	return GetTokenFromServer(id, false)
+}
+
+func GetIdFromToken(token string) int64 {
+	if !strings.Contains(token, ":") {
+		return 0
+	}
+
+	i, err := strconv.ParseInt(strings.Split(token, ":")[0], 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return i
 }
 
 func GetTokenFromServer(id int64, cache bool) *sibyl.TokenInfo {

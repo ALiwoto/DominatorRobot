@@ -2,6 +2,7 @@ package wotoConfig
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
@@ -104,11 +105,26 @@ func GetCmdPrefixes() []rune {
 	return []rune{'/', '!'}
 }
 
+func GetSibylToken() string {
+	if ConfigSettings == nil {
+		return ""
+	}
+
+	return ConfigSettings.SibylToken
+}
+
 func GetSibylClient() sibyl.SibylClient {
+	if ConfigSettings == nil {
+		return nil
+	}
+
 	return sibyl.NewClient(
 		ConfigSettings.SibylToken,
 		&sibyl.SibylConfig{
 			HostUrl: ConfigSettings.SibylUrl,
+			HttpClient: &http.Client{
+				Timeout: time.Second * 35,
+			},
 		},
 	)
 }

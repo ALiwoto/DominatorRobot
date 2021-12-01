@@ -1,8 +1,6 @@
 package scanPlugin
 
 import (
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/ALiwoto/argparser/argparser"
@@ -47,15 +45,10 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		target = replied.ForwardFrom.Id
 	}
 
-	text := strings.ReplaceAll(replied.Text, "\r", "")
-	text = strings.ReplaceAll(text, "\n", "\r\n")
-	text = strings.TrimSpace(text)
-	text = url.QueryEscape(text)
-
 	if force {
-		_, err = wv.SibylClient.Ban(target, reason, text, src, replied.From.IsBot)
+		_, err = wv.SibylClient.Ban(target, reason, replied.Text, src, replied.From.IsBot)
 	} else {
-		_, err = wv.SibylClient.Report(target, reason, text, src, replied.From.IsBot)
+		_, err = wv.SibylClient.Report(target, reason, replied.Text, src, replied.From.IsBot)
 	}
 
 	if err != nil {
