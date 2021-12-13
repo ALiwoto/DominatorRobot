@@ -5,6 +5,7 @@ import (
 
 	"github.com/ALiwoto/argparser/argparser"
 	"github.com/ALiwoto/mdparser/mdparser"
+	sibylSystemGo "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
@@ -46,9 +47,19 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	if force {
-		_, err = wv.SibylClient.Ban(target, reason, replied.Text, src, replied.From.IsBot)
+		_, err = wv.SibylClient.Ban(target, reason, &sibylSystemGo.BanConfig{
+			Message:  replied.Text,
+			SrcUrl:   src,
+			IsBot:    replied.From.IsBot,
+			TheToken: u.Hash,
+		})
 	} else {
-		_, err = wv.SibylClient.Report(target, reason, replied.Text, src, replied.From.IsBot)
+		_, err = wv.SibylClient.Report(target, reason, &sibylSystemGo.ReportConfig{
+			Message:  replied.Text,
+			SrcUrl:   src,
+			IsBot:    replied.From.IsBot,
+			TheToken: u.Hash,
+		})
 	}
 
 	if err != nil {
@@ -72,7 +83,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md = mdparser.GetMono("Sibyl request has been sent!")
+	md = mdparser.GetMono("Sibyl request has been sent.")
 
 	_, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,

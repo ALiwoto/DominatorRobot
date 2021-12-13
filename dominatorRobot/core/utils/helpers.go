@@ -9,13 +9,12 @@ import (
 	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
-	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/database"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 )
 
 func ResolveUser(id int64) *sibyl.TokenInfo {
-	return GetTokenFromServer(id, false)
+	return GetTokenFromServer(id)
 }
 
 func GetIdFromToken(token string) int64 {
@@ -31,15 +30,12 @@ func GetIdFromToken(token string) int64 {
 	return i
 }
 
-func GetTokenFromServer(id int64, cache bool) *sibyl.TokenInfo {
+func GetTokenFromServer(id int64) *sibyl.TokenInfo {
 	t, err := wotoValues.SibylClient.GetToken(id)
 	if err != nil || t == nil {
 		return nil
 	}
 
-	if cache {
-		database.NewToken(t)
-	}
 	return t
 }
 

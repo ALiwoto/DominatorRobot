@@ -7,11 +7,15 @@ github.com/ALiwoto/mdparser v1.0.7 h1:tIorE6pZfLTLlmyaHEWa2bG9UpZzGYgTPcSxDshcO8
 github.com/ALiwoto/mdparser v1.0.7/go.mod h1:93EnoGxVukI17RVlKi/yW0UX7mtMaDTHbheZsishw7c=
 github.com/ALiwoto/sibylSystemGo v1.0.4 h1:mnwR04fyMjOFc4f8B1GJqi1Mjudf2TjLSdDhOh7T9Y8=
 github.com/ALiwoto/sibylSystemGo v1.0.4/go.mod h1:dbRdKAt0r0riIfXneL/FA5KWBhJJdyVYm/uVkZyIPWM=
+github.com/ALiwoto/sibylSystemGo v1.0.5 h1:/uihi+JijF6W/s/qjv33nSdvE5yfuoRkhFb1rrVBu9Y=
+github.com/ALiwoto/sibylSystemGo v1.0.5/go.mod h1:dbRdKAt0r0riIfXneL/FA5KWBhJJdyVYm/uVkZyIPWM=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.1 h1:TDob1M3ljHPSZQyPFOZ6ZjOfF4GoYtDA+lfTzd+8Yew=
 github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.1/go.mod h1:r815fYWTudnU9JhtsJAxUtuV7QrSgKpChJkfTSMFpfg=
+github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.4 h1:1hKv9DvEwn//VsJgcCGt9+IAq4n+PZ38YL+pEhopxhk=
+github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.4/go.mod h1:r815fYWTudnU9JhtsJAxUtuV7QrSgKpChJkfTSMFpfg=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/bigkevmcd/go-configparser v0.0.0-20210106142102-909504547ead h1:UhYWAphNveMty305skySR5ST/hbYDexgsgkhcy0MDhM=
