@@ -1,13 +1,9 @@
 package wotoConfig
 
 type BotConfig struct {
-	BotToken     string
-	SibylUrl     string
-	DropUpdates  bool
-	DatabaseUrl  string
-	IsDebug      bool
-	UseSqlite    bool
-	DbName       string
-	SibylToken   string
-	MaxCacheTime int64
+	BotToken    string `section:"general" key:"bot_token"`
+	SibylToken  string `section:"general" key:"sibyl_token"`
+	DropUpdates bool   `section:"general" key:"drop_updates"`
+	SibylUrl    string `section:"general" key:"sibyl_url"`
+	IsDebug     bool   `section:"general" key:"debug"`
 }
