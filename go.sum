@@ -1,9 +1,8 @@
 github.com/ALiwoto/StrongStringGo v1.0.5/go.mod h1:t7WxtiphnwdgJaq443DSCAw7q+Ut3V8Pg1kT6IcdKmE=
-github.com/ALiwoto/StrongStringGo v1.0.6/go.mod h1:t7WxtiphnwdgJaq443DSCAw7q+Ut3V8Pg1kT6IcdKmE=
 github.com/ALiwoto/StrongStringGo v1.0.9 h1:sQp7A0a3enAY9gvAU5kvzht+IexYZ/UEu3XyV/++GQU=
 github.com/ALiwoto/StrongStringGo v1.0.9/go.mod h1:t7WxtiphnwdgJaq443DSCAw7q+Ut3V8Pg1kT6IcdKmE=
-github.com/ALiwoto/argparser v1.0.3 h1:6/Wzs94MAg1R3W0tsNA8tAbKEi836xuP0bXVUjU+jho=
-github.com/ALiwoto/argparser v1.0.3/go.mod h1:jnG7v5IcTdywj0UCPZkc8hqMIsREcEYcO2v/mKtFV4A=
+github.com/ALiwoto/argparser v1.0.4 h1:j3IAUVj+ad5rJwhPhCDgII+zwTQy8RmqqYgXBYMNLZc=
+github.com/ALiwoto/argparser v1.0.4/go.mod h1:U4zPGNeNPjAllE8kzU+tNL8XUatPfe3VJBoS/fj3qfk=
 github.com/ALiwoto/mdparser v1.0.7 h1:tIorE6pZfLTLlmyaHEWa2bG9UpZzGYgTPcSxDshcO8w=
 github.com/ALiwoto/mdparser v1.0.7/go.mod h1:93EnoGxVukI17RVlKi/yW0UX7mtMaDTHbheZsishw7c=
 github.com/ALiwoto/sibylSystemGo v1.0.5 h1:/uihi+JijF6W/s/qjv33nSdvE5yfuoRkhFb1rrVBu9Y=

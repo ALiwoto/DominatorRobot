@@ -34,7 +34,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	force := args.GetAsBool("f", "force", "force-ban")
+	force := args.HasFlag("f", "force", "force-ban")
 	reason := args.GetAsStringOrRaw("r", "reason", "reason")
 	original := args.HasFlag("o", "original", "origin")
 
