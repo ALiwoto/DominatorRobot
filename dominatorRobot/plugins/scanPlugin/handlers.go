@@ -37,6 +37,10 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	force := args.HasFlag("f", "force", "force-ban")
 	reason := args.GetAsStringOrRaw("r", "reason", "reason")
 	original := args.HasFlag("o", "original", "origin")
+	theSrc := args.GetAsString("s", "src", "source", "link", "ref", "reference")
+	if theSrc != "" {
+		src = theSrc
+	}
 
 	if reason == "" {
 		reason = args.GetFirstNoneEmptyValue()
@@ -85,7 +89,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	md = mdparser.GetMono("Sibyl request has been sent.")
 
-	_, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
+	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
 
@@ -146,9 +150,9 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md = mdparser.GetMono("Sibyl request has been sent!")
+	md = mdparser.GetMono("Sibyl request has been sent.")
 
-	_, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
+	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
 

@@ -54,7 +54,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	for _, frame := range initializeAnim {
 		mdBack = md.AppendNormal(frame)
 
-		topMsg, err = topMsg.EditText(b, mdBack.ToString(), &gotgbot.EditMessageTextOpts{
+		topMsg, _, err = topMsg.EditText(b, mdBack.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
 		if err != nil || topMsg == nil {
@@ -76,7 +76,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	md.AppendBoldThis("\n • RD: ").AppendNormalThis("2021-1107-T175741")
 	mdBack = md.AppendBoldThis("\n • Position: ").AppendNormalThis(userStatus)
 
-	topMsg, err = topMsg.EditText(b, mdBack.ToString(), &gotgbot.EditMessageTextOpts{
+	topMsg, _, err = topMsg.EditText(b, mdBack.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
 	if err != nil || topMsg == nil {
@@ -88,7 +88,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	md = md.AppendNormal("\n\nAffiliation: Public Safety Bureau, ")
 	md.AppendBoldThis("Criminal Investigation Department")
 
-	topMsg, err = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
+	topMsg, _, err = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
 	if err != nil || topMsg == nil {
@@ -100,7 +100,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	md = mdBack.AppendNormalThis("\n\nDominator usage approval Confirmed.")
 	md.AppendNormalThis(" You are a valid user!")
 
-	_, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
+	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
 	if err != nil || topMsg == nil {
