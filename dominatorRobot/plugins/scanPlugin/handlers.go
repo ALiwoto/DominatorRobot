@@ -294,7 +294,7 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md := mdparser.GetMono("Sibyl request cancelled by user.")
+	md := mdparser.GetMono("Sibyl request has been sent.")
 	_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
