@@ -15,8 +15,7 @@ func LoadAllHandlers(d *ext.Dispatcher, triggers []rune) {
 }
 
 func loadLimiter(d *ext.Dispatcher) {
-	wv.RateLimiter = ratelimiter.NewLimiter(d, false, false)
+	wv.RateLimiter = ratelimiter.NewLimiter(d, nil)
 	wv.RateLimiter.TextOnly = true
-	wv.RateLimiter.ConsiderUser = true
 	wv.RateLimiter.Start()
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/ALiwoto/mdparser/mdparser"
 	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
-	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 )
@@ -31,7 +31,7 @@ func GetIdFromToken(token string) int64 {
 }
 
 func GetTokenFromServer(id int64) *sibyl.TokenInfo {
-	t, err := wotoValues.SibylClient.GetToken(id)
+	t, err := wv.SibylClient.GetToken(id)
 	if err != nil || t == nil {
 		return nil
 	}
