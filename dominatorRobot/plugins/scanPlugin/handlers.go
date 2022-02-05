@@ -135,6 +135,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 }
 
 func showAlreadyBannedHandler(b *gotgbot.Bot, data *pendingScanData) error {
+	data.GeneratedUniqueId()
 	scanManager.AddData(data)
 	msg := data.ctx.EffectiveMessage
 	_, _ = msg.Reply(b, data.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{

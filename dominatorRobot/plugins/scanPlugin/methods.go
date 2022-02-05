@@ -5,6 +5,7 @@ import (
 
 	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 	"github.com/ALiwoto/mdparser/mdparser"
+	"github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 )
@@ -60,6 +61,31 @@ func (d *pendingScanData) GetButtons() *gotgbot.InlineKeyboardMarkup {
 	return markup
 }
 
+func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
+	md := mdparser.GetEmpty()
+	byUser, err := d.bot.GetChat(d.targetInfo.BannedBy)
+	if err != nil {
+		return md
+	}
+
+	byInfo, err := wv.SibylClient.GetGeneralInfo(d.targetInfo.BannedBy)
+	if err != nil {
+		return md
+	}
+
+	md.Bold("\n • Scanned by").Normal(": ")
+	switch byInfo.Permission {
+	case sibylSystem.Enforcer:
+		md.Link("enforcer ", "https://t.me/SibylSystem/13")
+	case sibylSystem.Inspector:
+		md.Link("inspector ", "https://t.me/SibylSystem/13")
+	}
+
+	md.Mention(byUser.FirstName, byUser.Id)
+	md.Normal("[").Mono(ws.ToBase10(byUser.Id)).Normal("]")
+	return md
+}
+
 func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 	md := mdparser.GetNormal("Target user is currently banned in Sibyl System ")
 	md.Normal("with the following details:")
@@ -71,11 +97,12 @@ func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 			Id:        d.Target,
 		}
 	}
+
 	md.Bold("\n • Target").Normal(": ")
 	md.Mention(user.FirstName, user.Id)
 	md.Normal("[").Mono(ws.ToBase10(user.Id)).Normal("]")
 	md.Bold("\n • Type").Normal(": ")
-	md.Mono("User")
+	md.Mono("User").AppendThis(d.getOperatorMd())
 	md.Bold("\n • Crime Coefficient").Normal(": ")
 	md.Mono(d.targetInfo.GetStringCrimeCoefficient())
 	md.Bold("\n • Reason(s)").Normal(": ")
