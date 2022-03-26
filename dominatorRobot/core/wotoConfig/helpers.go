@@ -42,6 +42,13 @@ func GetBotToken() string {
 	return ""
 }
 
+func SupportAnon() bool {
+	if ConfigSettings != nil {
+		return ConfigSettings.SupportAnon
+	}
+	return false
+}
+
 func DropUpdates() bool {
 	if ConfigSettings != nil {
 		return ConfigSettings.DropUpdates

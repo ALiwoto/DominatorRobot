@@ -3,7 +3,7 @@ module github.com/AnimeKaizoku/DominatorRobot
 go 1.18
 
 require (
-	github.com/ALiwoto/StrongStringGo v1.0.16
+	github.com/ALiwoto/StrongStringGo v1.0.18
 	github.com/ALiwoto/argparser v1.0.4
 	github.com/ALiwoto/mdparser v1.0.11
 	github.com/ALiwoto/sibylSystemGo v1.0.8

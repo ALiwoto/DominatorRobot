@@ -6,7 +6,9 @@ const (
 )
 
 const (
-	sepChar     = "_"
-	pendingData = "pending"
-	cancelData  = "cancel"
+	sepChar        = "_"
+	pendingData    = "pending"
+	cancelData     = "cancel"
+	anonCancelData = "anCanc"
+	anonConfirm    = "anConfirm"
 )

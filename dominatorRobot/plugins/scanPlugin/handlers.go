@@ -5,11 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ALiwoto/StrongStringGo/strongStringGo"
+	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 	"github.com/ALiwoto/argparser/argparser"
 	"github.com/ALiwoto/mdparser/mdparser"
 	sibylSystemGo "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
+	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -20,6 +21,21 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	sender := ctx.EffectiveUser.Id
 	if msg.ReplyToMessage == nil || msg.ReplyToMessage.From == nil {
 		return ext.EndGroups
+	}
+
+	// check for anon admin
+	if sender == 1087968824 {
+		if !wotoConfig.SupportAnon() {
+			return ext.EndGroups
+		}
+
+		// delete the old message (this method is nil-safe)
+		anonsMap.Get(msg.Chat.Id).DeleteMessage()
+
+		return sendAnonMessageHandler(b, &anonContainer{
+			bot: b,
+			ctx: ctx,
+		})
 	}
 
 	u := utils.ResolveUser(sender)
@@ -139,6 +155,18 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	return ext.EndGroups
 }
 
+func sendAnonMessageHandler(b *gotgbot.Bot, container *anonContainer) error {
+	anonsMap.Add(container.ctx.EffectiveChat.Id, container)
+	msg := container.ctx.EffectiveMessage
+	_, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
+		ParseMode:                wv.MarkdownV2,
+		DisableWebPagePreview:    true,
+		AllowSendingWithoutReply: true,
+		ReplyMarkup:              container.GetButtons(),
+	})
+	return ext.EndGroups
+}
+
 func showAlreadyBannedHandler(b *gotgbot.Bot, data *pendingScanData) error {
 	data.GeneratedUniqueId()
 	scansMap.Add(data.UniqueId, data)
@@ -221,9 +249,13 @@ func cancelScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, cancelData+sepChar)
 }
 
+func cancelAnonCallBackQuery(cq *gotgbot.CallbackQuery) bool {
+	return strings.HasPrefix(cq.Data, anonCancelData+sepChar)
+}
+
 func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
-	allStrs := strongStringGo.Split(query.Data, sepChar)
+	allStrs := ws.Split(query.Data, sepChar)
 	msg := query.Message
 	// format is cancelData + sepChar + d.getStrOwnerId() + sepChar + d.UniqueId
 	if len(allStrs) < 3 {
@@ -257,13 +289,38 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	return ext.EndGroups
 }
 
+func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
+	query := ctx.CallbackQuery
+	allStrs := ws.Split(query.Data, sepChar)
+	// format is cancelData + sepChar + d.getStrChatId()
+	if len(allStrs) < 2 {
+		return ext.EndGroups
+	}
+
+	chatId, err := strconv.ParseInt(allStrs[1], 10, 64)
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	u := utils.ResolveUser(query.From.Id)
+	if !utils.CanScan(u) {
+		return ext.EndGroups
+	}
+
+	container := anonsMap.Get(chatId)
+	container.DeleteMessage()
+	anonsMap.Delete(chatId)
+
+	return ext.EndGroups
+}
+
 func finalScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, pendingData+sepChar)
 }
 
 func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
-	allStrs := strongStringGo.Split(query.Data, sepChar)
+	allStrs := ws.Split(query.Data, sepChar)
 	msg := query.Message
 	// format is cancelData + sepChar + d.getStrOwnerId() + sepChar + d.UniqueId
 	if len(allStrs) < 3 {

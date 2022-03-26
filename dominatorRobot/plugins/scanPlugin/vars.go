@@ -2,12 +2,14 @@ package scanPlugin
 
 import (
 	"errors"
-
-	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 )
 
 var (
-	scansMap = ws.NewSafeEMap[string, pendingScanData]()
+	// scansMap contains the pending scan data by using their unique id as the key.
+	scansMap = _getScansMap()
+	// anonsMap contains the pending issued command by an anon admin. the key used is
+	// the group id.
+	anonsMap = _getAnonsMap()
 )
 
 var (

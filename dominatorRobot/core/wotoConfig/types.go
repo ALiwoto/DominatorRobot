@@ -6,4 +6,5 @@ type BotConfig struct {
 	DropUpdates bool   `section:"general" key:"drop_updates"`
 	SibylUrl    string `section:"general" key:"sibyl_url"`
 	IsDebug     bool   `section:"general" key:"debug"`
+	SupportAnon bool   `section:"general" key:"support_anon" default:"true"`
 }

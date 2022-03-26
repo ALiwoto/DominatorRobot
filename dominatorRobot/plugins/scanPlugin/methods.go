@@ -76,9 +76,9 @@ func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
 	md.Bold("\n • Scanned by").Normal(": ")
 	switch byInfo.Permission {
 	case sibylSystem.Enforcer:
-		md.Link("enforcer ", "https://t.me/SibylSystem/13")
+		md.Bold("enforcer ")
 	case sibylSystem.Inspector:
-		md.Link("inspector ", "https://t.me/SibylSystem/13")
+		md.Bold("inspector ")
 	}
 
 	md.Mention(byUser.FirstName, byUser.Id)
@@ -119,6 +119,39 @@ func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 	md.Normal("\n\n Are you sure you want to proceed with scanning?")
 
 	return md
+}
+
+//---------------------------------------------------------
+
+func (a *anonContainer) DeleteMessage() {
+	if a != nil && a.myMessage != nil {
+		_, _ = a.myMessage.Delete(a.bot)
+	}
+}
+
+func (a *anonContainer) ParseAsMd() mdparser.WMarkDown {
+	md := mdparser.GetNormal("Seems like you are an anonymous user.\n")
+	md.Normal("Please press the button below to confirm you are a valid user registered at PSB.")
+	return md
+}
+
+func (a *anonContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
+	markup := &gotgbot.InlineKeyboardMarkup{}
+	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 2)
+	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
+		Text:         "Press to confirm",
+		CallbackData: anonConfirm + sepChar + a.getStrChatId(),
+	})
+	markup.InlineKeyboard[1] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
+		Text:         "cancel",
+		CallbackData: anonCancelData + sepChar + a.getStrChatId(),
+	})
+
+	return markup
+}
+
+func (a *anonContainer) getStrChatId() string {
+	return ws.ToBase10(a.ctx.EffectiveChat.Id)
 }
 
 //---------------------------------------------------------

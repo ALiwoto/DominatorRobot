@@ -17,3 +17,9 @@ type pendingScanData struct {
 	banConfig    *sibylSystemGo.BanConfig
 	reportConfig *sibylSystemGo.ReportConfig
 }
+
+type anonContainer struct {
+	myMessage *gotgbot.Message
+	ctx       *ext.Context
+	bot       *gotgbot.Bot
+}
