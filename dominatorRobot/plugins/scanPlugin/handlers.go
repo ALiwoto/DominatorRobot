@@ -55,6 +55,11 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		targetType = sibylSystemGo.EntityTypeBot
 	}
 
+	if target == b.Id {
+		// maybe add a message or a warning or a cool quote here? dunno
+		return ext.EndGroups
+	}
+
 	targetInfo, _ := wv.SibylClient.GetInfo(target)
 	if targetInfo != nil && targetInfo.Banned {
 		var banConfig *sibylSystemGo.BanConfig
