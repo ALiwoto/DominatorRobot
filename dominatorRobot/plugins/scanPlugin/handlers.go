@@ -158,12 +158,13 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 func sendAnonMessageHandler(b *gotgbot.Bot, container *anonContainer) error {
 	anonsMap.Add(container.ctx.EffectiveChat.Id, container)
 	msg := container.ctx.EffectiveMessage
-	_, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
+	container.myMessage, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
 		ParseMode:                wv.MarkdownV2,
 		DisableWebPagePreview:    true,
 		AllowSendingWithoutReply: true,
 		ReplyMarkup:              container.GetButtons(),
 	})
+
 	return ext.EndGroups
 }
 
