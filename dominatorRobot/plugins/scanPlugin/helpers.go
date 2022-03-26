@@ -1,17 +1,21 @@
 package scanPlugin
 
 import (
-	"sync"
+	"time"
 
+	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
 )
 
-func _getScanManager() *pendingScanManager {
-	return &pendingScanManager{
-		pendingMutex: &sync.Mutex{},
-		pendingMap:   make(map[string]*pendingScanData),
-	}
+func _getScansMap() *ws.SafeEMap[string, pendingScanData] {
+	m := ws.NewSafeEMap[string, pendingScanData]()
+
+	m.SetInterval(15 * time.Minute)
+	m.SetExpiration(10 * time.Minute)
+	m.EnableChecking()
+
+	return m
 }
 
 func LoadAllHandlers(d *ext.Dispatcher, t []rune) {

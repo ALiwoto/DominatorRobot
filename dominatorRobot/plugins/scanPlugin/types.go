@@ -1,8 +1,6 @@
 package scanPlugin
 
 import (
-	"sync"
-
 	sibylSystemGo "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -18,9 +16,4 @@ type pendingScanData struct {
 	targetInfo   *sibylSystemGo.GetInfoResult
 	banConfig    *sibylSystemGo.BanConfig
 	reportConfig *sibylSystemGo.ReportConfig
-}
-
-type pendingScanManager struct {
-	pendingMutex *sync.Mutex
-	pendingMap   map[string]*pendingScanData
 }

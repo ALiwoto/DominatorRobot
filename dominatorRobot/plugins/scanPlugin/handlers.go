@@ -136,7 +136,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 func showAlreadyBannedHandler(b *gotgbot.Bot, data *pendingScanData) error {
 	data.GeneratedUniqueId()
-	scanManager.AddData(data)
+	scansMap.Add(data.UniqueId, data)
 	msg := data.ctx.EffectiveMessage
 	_, _ = msg.Reply(b, data.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
 		ParseMode:                wv.MarkdownV2,
@@ -240,7 +240,7 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	uniqueId := allStrs[2]
-	scanManager.RemoveData(uniqueId)
+	scansMap.Delete(uniqueId)
 	if msg == nil {
 		return ext.EndGroups
 	}
@@ -280,8 +280,8 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	uniqueId := allStrs[2]
-	err = scanManager.GetScanData(uniqueId).TakeAction()
-	scanManager.RemoveData(uniqueId)
+	err = scansMap.Get(uniqueId).TakeAction()
+	scansMap.Delete(uniqueId)
 	if msg == nil {
 		return ext.EndGroups
 	}

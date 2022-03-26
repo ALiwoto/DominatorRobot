@@ -122,25 +122,3 @@ func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 }
 
 //---------------------------------------------------------
-
-func (m *pendingScanManager) GetScanData(uniqueId string) *pendingScanData {
-	m.pendingMutex.Lock()
-	data := m.pendingMap[uniqueId]
-	m.pendingMutex.Unlock()
-
-	return data
-}
-
-func (m *pendingScanManager) AddData(data *pendingScanData) {
-	m.pendingMutex.Lock()
-	m.pendingMap[data.UniqueId] = data
-	m.pendingMutex.Unlock()
-}
-
-func (m *pendingScanManager) RemoveData(uniqueId string) {
-	m.pendingMutex.Lock()
-	delete(m.pendingMap, uniqueId)
-	m.pendingMutex.Unlock()
-}
-
-//---------------------------------------------------------

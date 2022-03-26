@@ -1,9 +1,13 @@
 package scanPlugin
 
-import "errors"
+import (
+	"errors"
+
+	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
+)
 
 var (
-	scanManager = _getScanManager()
+	scansMap = ws.NewSafeEMap[string, pendingScanData]()
 )
 
 var (

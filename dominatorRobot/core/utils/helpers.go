@@ -54,7 +54,7 @@ func SendAlertErr(b *gotgbot.Bot, m *gotgbot.Message, e error) error {
 	if e == nil {
 		return nil
 	}
-	md := mdparser.GetItalic("Failed, due to an error: \n")
+	md := mdparser.GetItalic("Sibyl System says: \n")
 	md = md.AppendNormal(e.Error())
 
 	return SendAlert(b, m, md)
