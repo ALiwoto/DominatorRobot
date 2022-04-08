@@ -129,6 +129,13 @@ func (a *anonContainer) DeleteMessage() {
 	}
 }
 
+// FastDelete will delete the `myMessage` field of this anonContainer value;
+// it's called "fast", because it doesn't have any nil-check in it, you have to
+// check for that before even calling this method, otherwise you will get panic
+func (a *anonContainer) FastDeleteMessage() {
+	_, _ = a.myMessage.Delete(a.bot)
+}
+
 func (a *anonContainer) ParseAsMd() mdparser.WMarkDown {
 	md := mdparser.GetNormal("Seems like you are an anonymous user.\n")
 	md.Normal("Please press the button below to confirm you are a valid user registered at PSB.")

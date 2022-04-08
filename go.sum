@@ -7,6 +7,8 @@ github.com/ALiwoto/StrongStringGo v1.0.17 h1:C3xSYdl6LE/xPmmk+QKkp7TPYXL4kdDg90b
 github.com/ALiwoto/StrongStringGo v1.0.17/go.mod h1:TTdQ00xWfw4XTbG49A42DDSAODPsCUi0ZCRPM+/ga1k=
 github.com/ALiwoto/StrongStringGo v1.0.18 h1:LtoKRyH/t6BOsZbEzUrVKgJjxxxvOqVo9ySFtM7bJjw=
 github.com/ALiwoto/StrongStringGo v1.0.18/go.mod h1:TTdQ00xWfw4XTbG49A42DDSAODPsCUi0ZCRPM+/ga1k=
+github.com/ALiwoto/StrongStringGo v1.0.19 h1:OhiwoMseu7eQ5dMSpRy2Z86AWYHjq79rKE3kxHeuRRw=
+github.com/ALiwoto/StrongStringGo v1.0.19/go.mod h1:TTdQ00xWfw4XTbG49A42DDSAODPsCUi0ZCRPM+/ga1k=
 github.com/ALiwoto/argparser v1.0.4 h1:j3IAUVj+ad5rJwhPhCDgII+zwTQy8RmqqYgXBYMNLZc=
 github.com/ALiwoto/argparser v1.0.4/go.mod h1:U4zPGNeNPjAllE8kzU+tNL8XUatPfe3VJBoS/fj3qfk=
 github.com/ALiwoto/mdparser v1.0.11 h1:qQq8e3Bco60ziiMFhq1F8QLaFhnB+pBtkg6dvdcwDzg=

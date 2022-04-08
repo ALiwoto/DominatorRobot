@@ -6,6 +6,8 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 )
 
+type anonRequestType uint8
+
 type pendingScanData struct {
 	ctx          *ext.Context
 	bot          *gotgbot.Bot
@@ -22,4 +24,5 @@ type anonContainer struct {
 	myMessage *gotgbot.Message
 	ctx       *ext.Context
 	bot       *gotgbot.Bot
+	request   anonRequestType
 }

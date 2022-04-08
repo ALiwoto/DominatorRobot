@@ -186,6 +186,21 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
 	sender := ctx.EffectiveUser.Id
 
+	// check for anon admin
+	if sender == 1087968824 {
+		if !wotoConfig.SupportAnon() {
+			return ext.EndGroups
+		}
+
+		// delete the old message (this method is nil-safe)
+		anonsMap.Get(msg.Chat.Id).DeleteMessage()
+
+		return sendAnonMessageHandler(b, &anonContainer{
+			bot: b,
+			ctx: ctx,
+		})
+	}
+
 	u := utils.ResolveUser(sender)
 	if !utils.CanScan(u) {
 		return ext.EndGroups
@@ -254,6 +269,10 @@ func cancelAnonCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, anonCancelData+sepChar)
 }
 
+func confirmAnonCallBackQuery(cq *gotgbot.CallbackQuery) bool {
+	return strings.HasPrefix(cq.Data, anonConfirm+sepChar)
+}
+
 func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
 	allStrs := ws.Split(query.Data, sepChar)
@@ -293,7 +312,7 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
 	allStrs := ws.Split(query.Data, sepChar)
-	// format is cancelData + sepChar + d.getStrChatId()
+	// format is anonCancelData + sepChar + d.getStrChatId()
 	if len(allStrs) < 2 {
 		return ext.EndGroups
 	}
@@ -313,6 +332,52 @@ func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	anonsMap.Delete(chatId)
 
 	return ext.EndGroups
+}
+
+func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
+	query := ctx.CallbackQuery
+	allStrs := ws.Split(query.Data, sepChar)
+	// format is anonConfirm + sepChar + d.getStrChatId() + anonRequest
+	if len(allStrs) < 2 {
+		return ext.EndGroups
+	}
+
+	chatId, err := strconv.ParseInt(allStrs[1], 10, 64)
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	u := utils.ResolveUser(query.From.Id)
+	if !utils.CanScan(u) {
+		return ext.EndGroups
+	}
+
+	container := anonsMap.Get(chatId)
+	anonsMap.Delete(chatId)
+	if container == nil {
+		_, _ = ctx.EffectiveMessage.Delete(bot)
+		return nil
+	}
+
+	container.FastDeleteMessage()
+
+	// hacky way to reduce amount of code (or rather, reuse the previously written code)
+	container.ctx.EffectiveSender = ctx.EffectiveSender
+	container.ctx.EffectiveUser = ctx.EffectiveUser
+
+	switch container.request {
+	case anonRequestScan:
+		return scanHandler(bot, container.ctx)
+	case anonRequestRevert:
+		return revertHandler(bot, container.ctx)
+
+	default:
+		// hm? unknown request type, sounds like not implemented or something
+		// like that
+		// anyway, too lazy to log this
+		return nil
+	}
+
 }
 
 func finalScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {

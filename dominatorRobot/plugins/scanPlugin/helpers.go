@@ -37,12 +37,13 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	cancelScanCb := handlers.NewCallback(cancelScanCallBackQuery, cancelScanResponse)
 	finalScanCb := handlers.NewCallback(finalScanCallBackQuery, finalScanResponse)
 	cancelAnonCb := handlers.NewCallback(cancelAnonCallBackQuery, cancelAnonResponse)
-	//confirmAnonCb := handlers.NewCallback(confirmAnonCallBackQuery, confirmAnonResponse)
+	confirmAnonCb := handlers.NewCallback(confirmAnonCallBackQuery, confirmAnonResponse)
 
 	scanCmd.Triggers = t
 	revertCmd.Triggers = t
 
 	d.AddHandler(cancelAnonCb)
+	d.AddHandler(confirmAnonCb)
 	d.AddHandler(cancelScanCb)
 	d.AddHandler(finalScanCb)
 	d.AddHandler(scanCmd)

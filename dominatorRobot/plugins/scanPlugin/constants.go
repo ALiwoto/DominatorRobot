@@ -12,3 +12,8 @@ const (
 	anonCancelData = "anCanc"
 	anonConfirm    = "anConfirm"
 )
+
+const (
+	anonRequestScan anonRequestType = iota + 1
+	anonRequestRevert
+)
