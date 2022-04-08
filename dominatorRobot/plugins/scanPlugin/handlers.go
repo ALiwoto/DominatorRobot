@@ -33,8 +33,9 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		anonsMap.Get(msg.Chat.Id).DeleteMessage()
 
 		return sendAnonMessageHandler(b, &anonContainer{
-			bot: b,
-			ctx: ctx,
+			bot:     b,
+			ctx:     ctx,
+			request: anonRequestScan,
 		})
 	}
 
@@ -196,8 +197,9 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		anonsMap.Get(msg.Chat.Id).DeleteMessage()
 
 		return sendAnonMessageHandler(b, &anonContainer{
-			bot: b,
-			ctx: ctx,
+			bot:     b,
+			ctx:     ctx,
+			request: anonRequestRevert,
 		})
 	}
 
@@ -336,8 +338,9 @@ func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
+	// a simple data is "anConfirm_-1001632556172"
 	allStrs := ws.Split(query.Data, sepChar)
-	// format is anonConfirm + sepChar + d.getStrChatId() + anonRequest
+	// format is anonConfirm + sepChar + d.getStrChatId()
 	if len(allStrs) < 2 {
 		return ext.EndGroups
 	}
