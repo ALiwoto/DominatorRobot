@@ -329,9 +329,8 @@ func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	container := anonsMap.Get(chatId)
-	container.DeleteMessage()
 	anonsMap.Delete(chatId)
+	_, _ = ctx.EffectiveMessage.Delete(bot)
 
 	return ext.EndGroups
 }
