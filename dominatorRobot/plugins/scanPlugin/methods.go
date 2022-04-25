@@ -129,7 +129,7 @@ func (a *anonContainer) DeleteMessage() {
 	}
 }
 
-// FastDelete will delete the `myMessage` field of this anonContainer value;
+// FastDeleteMessage will delete the `myMessage` field of this anonContainer value;
 // it's called "fast", because it doesn't have any nil-check in it, you have to
 // check for that before even calling this method, otherwise you will get panic
 func (a *anonContainer) FastDeleteMessage() {
@@ -188,19 +188,6 @@ func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 
 func (i *inspectorContainer) getStrOwnerId() string {
 	return ws.ToBase10(i.ctx.EffectiveChat.Id)
-}
-
-func (i *inspectorContainer) DeleteMessage() {
-	if i != nil && i.myMessage != nil {
-		_, _ = i.myMessage.Delete(i.bot)
-	}
-}
-
-// FastDelete will delete the `myMessage` field of this anonContainer value;
-// it's called "fast", because it doesn't have any nil-check in it, you have to
-// check for that before even calling this method, otherwise you will get panic
-func (i *inspectorContainer) FastDeleteMessage() {
-	_, _ = i.myMessage.Delete(i.bot)
 }
 
 //---------------------------------------------------------
