@@ -416,9 +416,9 @@ func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
-	// a simple data is "anConfirm_-1001632556172"
+	// a simple data is "insAc_confirm_1341091260"
 	allStrs := ws.Split(query.Data, sepChar)
-	// format is anonConfirm + sepChar + d.getStrChatId()
+	// format is inspectorActionData + sepChar + forceData + sepChar + i.getStrOwnerId()
 	if len(allStrs) < 2 {
 		return ext.EndGroups
 	}

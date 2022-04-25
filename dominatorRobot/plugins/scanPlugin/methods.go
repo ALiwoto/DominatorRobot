@@ -187,7 +187,7 @@ func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 }
 
 func (i *inspectorContainer) getStrOwnerId() string {
-	return ws.ToBase10(i.ctx.EffectiveChat.Id)
+	return ws.ToBase10(i.ctx.EffectiveUser.Id)
 }
 
 //---------------------------------------------------------
