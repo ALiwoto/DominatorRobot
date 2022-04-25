@@ -147,6 +147,12 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		return ext.EndGroups
 	}
 
+	if noRedirect {
+		// noRedirect is passed as true, we shouldn't show any
+		// animation message.
+		return ext.EndGroups
+	}
+
 	md := mdparser.GetNormal("Sending a cymatic scan request to Sibyl...")
 	topMsg, err := ctx.EffectiveMessage.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
 		AllowSendingWithoutReply: false,
@@ -158,11 +164,6 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 
 	time.Sleep(time.Millisecond * 600)
 
-	if err != nil {
-		_ = utils.SendAlertErr(b, msg, err)
-		return ext.EndGroups
-	}
-
 	md = mdparser.GetMono("Sibyl request has been sent.")
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
@@ -173,7 +174,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 }
 
 func sendInspectorScanPanelHandler(b *gotgbot.Bot, container *inspectorContainer) error {
-	inspectorsMap.Add(container.ctx.EffectiveChat.Id, container)
+	inspectorsMap.Add(container.ctx.EffectiveSender.Id(), container)
 	msg := container.ctx.EffectiveMessage
 	container.myMessage, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
 		ParseMode:                wv.MarkdownV2,
@@ -419,41 +420,65 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	// a simple data is "insAc_confirm_1341091260"
 	allStrs := ws.Split(query.Data, sepChar)
 	// format is inspectorActionData + sepChar + forceData + sepChar + i.getStrOwnerId()
-	if len(allStrs) < 2 {
+	if len(allStrs) < 3 {
 		return ext.EndGroups
 	}
 
-	chatId, err := strconv.ParseInt(allStrs[1], 10, 64)
+	ownerId, err := strconv.ParseInt(allStrs[2], 10, 64)
 	if err != nil {
 		return ext.EndGroups
 	}
 
 	u := utils.ResolveUser(query.From.Id)
 	if !utils.CanScan(u) {
+		// user has lost the ability to scan.
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "This button is not for you...",
+			ShowAlert: true,
+			CacheTime: 5500,
+		})
+		_, _ = ctx.EffectiveMessage.Delete(bot)
 		return ext.EndGroups
 	}
 
-	container := anonsMap.Get(chatId)
-	anonsMap.Delete(chatId)
+	if ownerId != query.From.Id {
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "This button is not for you...",
+			ShowAlert: true,
+			CacheTime: 5500,
+		})
+		return ext.EndGroups
+	}
+
+	container := inspectorsMap.Get(ownerId)
+	inspectorsMap.Delete(ownerId)
 	if container == nil {
 		_, _ = ctx.EffectiveMessage.Delete(bot)
 		return nil
 	}
 
-	container.FastDeleteMessage()
-
-	// hacky way to reduce amount of code (or rather, reuse the previously written code)
-	container.ctx.EffectiveSender = ctx.EffectiveSender
-	container.ctx.EffectiveUser = ctx.EffectiveUser
-
-	switch container.request {
-	case anonRequestScan:
-		return scanHandler(bot, container.ctx)
-	case anonRequestRevert:
-		return revertHandler(bot, container.ctx)
-
+	data := allStrs[1]
+	switch data {
+	case forceData:
+		md := mdparser.GetMono("Force scan request has been sent.")
+		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
+			ParseMode: wv.MarkdownV2,
+		})
+		return coreScanHandler(bot, container.ctx, true, true)
+	case confirmData:
+		md := mdparser.GetMono("Cymatic scan request has been sent.")
+		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
+			ParseMode: wv.MarkdownV2,
+		})
+		return coreScanHandler(bot, container.ctx, false, true)
+	case cancelData:
+		md := mdparser.GetMono("Scan request has been cancelled by user.")
+		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
+			ParseMode: wv.MarkdownV2,
+		})
+		return nil
 	default:
-		// hm? unknown request type, sounds like not implemented or something
+		// hm? unknown data, sounds like not implemented or something
 		// like that
 		// anyway, too lazy to log this
 		return nil
