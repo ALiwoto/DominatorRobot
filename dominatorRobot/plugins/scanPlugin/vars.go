@@ -10,6 +10,8 @@ var (
 	// anonsMap contains the pending issued command by an anon admin. the key used is
 	// the group id.
 	anonsMap = _getAnonsMap()
+	// inspectorsMap contains the
+	inspectorsMap = _getInspectorsMap()
 )
 
 var (

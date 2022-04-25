@@ -5,18 +5,23 @@ import (
 	"strings"
 	"time"
 
-	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 	"github.com/ALiwoto/argparser/argparser"
 	"github.com/ALiwoto/mdparser/mdparser"
 	sibylSystemGo "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 )
 
+// scanHandler is just a wrapper around coreScanHandler function.
 func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
+	return coreScanHandler(b, ctx, false, false)
+}
+
+func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool) error {
 	msg := ctx.EffectiveMessage
 	sender := ctx.EffectiveUser.Id
 	if msg.ReplyToMessage == nil || msg.ReplyToMessage.From == nil {
@@ -25,7 +30,9 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	// check for anon admin
 	if sender == 1087968824 {
-		if !wotoConfig.SupportAnon() {
+		if !wotoConfig.SupportAnon() || noRedirect {
+			// just return from the handler if supporting anon admin is disabled
+			// or we are disallowed to redirect from this function.
 			return ext.EndGroups
 		}
 
@@ -55,7 +62,7 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	force := args.HasFlag("f", "force", "force-ban")
+	force := forceScan || args.HasFlag("f", "force", "force-ban")
 	reason := args.GetAsStringOrRaw("r", "reason", "reason")
 	original := args.HasFlag("o", "original", "origin")
 
@@ -118,12 +125,21 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 			TheToken:   u.Hash,
 		})
 	} else {
-		_, err = wv.SibylClient.Report(target, reason, &sibylSystemGo.ReportConfig{
-			Message:    replied.Text,
-			SrcUrl:     src,
-			TargetType: targetType,
-			TheToken:   u.Hash,
-		})
+		if u.Permission.CanBan() && !noRedirect {
+			container := &inspectorContainer{
+				ctx:           ctx,
+				bot:           b,
+				originHandler: coreScanHandler,
+			}
+			return sendInspectorScanPanelHandler(b, container)
+		} else {
+			_, err = wv.SibylClient.Report(target, reason, &sibylSystemGo.ReportConfig{
+				Message:    replied.Text,
+				SrcUrl:     src,
+				TargetType: targetType,
+				TheToken:   u.Hash,
+			})
+		}
 	}
 
 	if err != nil {
@@ -151,6 +167,19 @@ func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
+	})
+
+	return ext.EndGroups
+}
+
+func sendInspectorScanPanelHandler(b *gotgbot.Bot, container *inspectorContainer) error {
+	inspectorsMap.Add(container.ctx.EffectiveChat.Id, container)
+	msg := container.ctx.EffectiveMessage
+	container.myMessage, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
+		ParseMode:                wv.MarkdownV2,
+		DisableWebPagePreview:    true,
+		AllowSendingWithoutReply: true,
+		ReplyMarkup:              container.GetButtons(),
 	})
 
 	return ext.EndGroups
@@ -275,6 +304,10 @@ func confirmAnonCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, anonConfirm+sepChar)
 }
 
+func inspectorsCallBackQuery(cq *gotgbot.CallbackQuery) bool {
+	return strings.HasPrefix(cq.Data, inspectorActionData+sepChar)
+}
+
 func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
 	allStrs := ws.Split(query.Data, sepChar)
@@ -379,7 +412,52 @@ func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		// anyway, too lazy to log this
 		return nil
 	}
+}
 
+func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
+	query := ctx.CallbackQuery
+	// a simple data is "anConfirm_-1001632556172"
+	allStrs := ws.Split(query.Data, sepChar)
+	// format is anonConfirm + sepChar + d.getStrChatId()
+	if len(allStrs) < 2 {
+		return ext.EndGroups
+	}
+
+	chatId, err := strconv.ParseInt(allStrs[1], 10, 64)
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	u := utils.ResolveUser(query.From.Id)
+	if !utils.CanScan(u) {
+		return ext.EndGroups
+	}
+
+	container := anonsMap.Get(chatId)
+	anonsMap.Delete(chatId)
+	if container == nil {
+		_, _ = ctx.EffectiveMessage.Delete(bot)
+		return nil
+	}
+
+	container.FastDeleteMessage()
+
+	// hacky way to reduce amount of code (or rather, reuse the previously written code)
+	container.ctx.EffectiveSender = ctx.EffectiveSender
+	container.ctx.EffectiveUser = ctx.EffectiveUser
+
+	switch container.request {
+	case anonRequestScan:
+		return scanHandler(bot, container.ctx)
+	case anonRequestRevert:
+		return revertHandler(bot, container.ctx)
+
+	default:
+		// hm? unknown request type, sounds like not implemented or something
+		// like that
+		// anyway, too lazy to log this
+		return nil
+	}
 }
 
 func finalScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {

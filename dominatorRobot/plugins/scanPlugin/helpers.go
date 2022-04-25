@@ -3,7 +3,7 @@ package scanPlugin
 import (
 	"time"
 
-	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
+	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
 )
@@ -31,6 +31,27 @@ func _getAnonsMap() *ws.SafeEMap[int64, anonContainer] {
 	return m
 }
 
+func _getInspectorsMap() *ws.SafeEMap[int64, inspectorContainer] {
+	m := ws.NewSafeEMap[int64, inspectorContainer]()
+
+	m.SetInterval(10 * time.Minute)
+	m.SetExpiration(5 * time.Minute)
+	m.SetOnExpired(func(key int64, value inspectorContainer) {
+		if value.myMessage == nil {
+			return
+		}
+
+		_, _ = value.myMessage.Delete(value.bot)
+
+		if value.originHandler != nil {
+			_ = value.originHandler(value.bot, value.ctx, false, true)
+		}
+	})
+	m.EnableChecking()
+
+	return m
+}
+
 func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	scanCmd := handlers.NewCommand(ScanCmd, scanHandler)
 	revertCmd := handlers.NewCommand(RevertCmd, revertHandler)
@@ -38,12 +59,14 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	finalScanCb := handlers.NewCallback(finalScanCallBackQuery, finalScanResponse)
 	cancelAnonCb := handlers.NewCallback(cancelAnonCallBackQuery, cancelAnonResponse)
 	confirmAnonCb := handlers.NewCallback(confirmAnonCallBackQuery, confirmAnonResponse)
+	inspectorsCb := handlers.NewCallback(inspectorsCallBackQuery, inspectorsResponse)
 
 	scanCmd.Triggers = t
 	revertCmd.Triggers = t
 
 	d.AddHandler(cancelAnonCb)
 	d.AddHandler(confirmAnonCb)
+	d.AddHandler(inspectorsCb)
 	d.AddHandler(cancelScanCb)
 	d.AddHandler(finalScanCb)
 	d.AddHandler(scanCmd)

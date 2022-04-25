@@ -6,11 +6,14 @@ const (
 )
 
 const (
-	sepChar        = "_"
-	pendingData    = "pending"
-	cancelData     = "cancel"
-	anonCancelData = "anCanc"
-	anonConfirm    = "anConfirm"
+	sepChar             = "_"
+	pendingData         = "pending"
+	cancelData          = "cancel"
+	anonCancelData      = "anCanc"
+	anonConfirm         = "anConfirm"
+	forceData           = "force"
+	confirmData         = "confirm"
+	inspectorActionData = "insAc"
 )
 
 const (

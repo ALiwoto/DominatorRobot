@@ -3,10 +3,10 @@ package scanPlugin
 import (
 	"time"
 
-	ws "github.com/ALiwoto/StrongStringGo/strongStringGo"
 	"github.com/ALiwoto/mdparser/mdparser"
 	"github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 )
 
@@ -159,6 +159,48 @@ func (a *anonContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 
 func (a *anonContainer) getStrChatId() string {
 	return ws.ToBase10(a.ctx.EffectiveChat.Id)
+}
+
+//---------------------------------------------------------
+
+func (i *inspectorContainer) ParseAsMd() mdparser.WMarkDown {
+	return mdparser.GetNormal("Preparing a cymatic scan request for the target user...")
+}
+
+func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
+	markup := &gotgbot.InlineKeyboardMarkup{}
+	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 2)
+	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
+		Text:         "Force scan",
+		CallbackData: inspectorActionData + sepChar + forceData + sepChar + i.getStrOwnerId(),
+	})
+	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
+		Text:         "Confirm",
+		CallbackData: inspectorActionData + sepChar + confirmData + sepChar + i.getStrOwnerId(),
+	})
+	markup.InlineKeyboard[1] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
+		Text:         "Cancel",
+		CallbackData: inspectorActionData + sepChar + cancelData + sepChar + i.getStrOwnerId(),
+	})
+
+	return markup
+}
+
+func (i *inspectorContainer) getStrOwnerId() string {
+	return ws.ToBase10(i.ctx.EffectiveChat.Id)
+}
+
+func (i *inspectorContainer) DeleteMessage() {
+	if i != nil && i.myMessage != nil {
+		_, _ = i.myMessage.Delete(i.bot)
+	}
+}
+
+// FastDelete will delete the `myMessage` field of this anonContainer value;
+// it's called "fast", because it doesn't have any nil-check in it, you have to
+// check for that before even calling this method, otherwise you will get panic
+func (i *inspectorContainer) FastDeleteMessage() {
+	_, _ = i.myMessage.Delete(i.bot)
 }
 
 //---------------------------------------------------------

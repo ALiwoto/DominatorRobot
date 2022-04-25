@@ -26,3 +26,10 @@ type anonContainer struct {
 	bot       *gotgbot.Bot
 	request   anonRequestType
 }
+
+type inspectorContainer struct {
+	myMessage     *gotgbot.Message
+	ctx           *ext.Context
+	bot           *gotgbot.Bot
+	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool) error
+}
