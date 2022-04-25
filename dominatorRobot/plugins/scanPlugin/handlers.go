@@ -338,7 +338,7 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md := mdparser.GetMono("Sibyl request cancelled by user.")
+	md := mdparser.GetMono("Sibyl request canceled by user.")
 	_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
@@ -472,7 +472,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		})
 		return coreScanHandler(bot, container.ctx, false, true)
 	case cancelData:
-		md := mdparser.GetMono("Scan request has been cancelled by user.")
+		md := mdparser.GetMono("Scan request has been canceled by user.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
