@@ -3,7 +3,7 @@ module github.com/AnimeKaizoku/DominatorRobot
 go 1.18
 
 require (
-	github.com/ALiwoto/argparser v1.0.4
+	github.com/ALiwoto/argparser v1.0.5
 	github.com/ALiwoto/mdparser v1.1.2
 	github.com/ALiwoto/sibylSystemGo v1.0.9
 	github.com/AnimeKaizoku/ssg v1.1.3
@@ -13,7 +13,6 @@ require (
 )
 
 require (
-	github.com/ALiwoto/StrongStringGo v1.1.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
