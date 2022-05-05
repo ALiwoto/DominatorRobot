@@ -171,17 +171,17 @@ func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 	markup := &gotgbot.InlineKeyboardMarkup{}
 	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 2)
 	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
-		Text:         "Force scan",
+		Text:         "Force",
 		CallbackData: inspectorActionData + sepChar + forceData + sepChar + i.getStrOwnerId(),
 	})
 	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
-		Text:         "Confirm",
+		Text:         "✖️",
 		CallbackData: inspectorActionData + sepChar + confirmData + sepChar + i.getStrOwnerId(),
 	})
-	markup.InlineKeyboard[1] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
-		Text:         "Cancel",
-		CallbackData: inspectorActionData + sepChar + cancelData + sepChar + i.getStrOwnerId(),
-	})
+	//markup.InlineKeyboard[1] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
+	//	Text:         "Cancel",
+	//	CallbackData: inspectorActionData + sepChar + cancelData + sepChar + i.getStrOwnerId(),
+	//})
 
 	return markup
 }
