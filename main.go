@@ -21,6 +21,6 @@ func main() {
 
 	err = plugins.StartTelegramBot()
 	if err != nil {
-		logging.Fatal("Failed to start the bot bot: ", err)
+		logging.Fatal("Failed to start the bot: ", err)
 	}
 }
