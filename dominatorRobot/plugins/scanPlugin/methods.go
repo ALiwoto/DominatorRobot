@@ -169,7 +169,7 @@ func (i *inspectorContainer) ParseAsMd() mdparser.WMarkDown {
 
 func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 	markup := &gotgbot.InlineKeyboardMarkup{}
-	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 2)
+	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 1)
 	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
 		Text:         "Force",
 		CallbackData: inspectorActionData + sepChar + forceData + sepChar + i.getStrOwnerId(),
