@@ -153,6 +153,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			container := &inspectorContainer{
 				ctx:           ctx,
 				bot:           b,
+				targetUser:    target,
 				originHandler: coreScanHandler,
 			}
 			return sendInspectorScanPanelHandler(b, container)
@@ -528,7 +529,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
-	// a simple data is "mulTi_1341091260_1454547878"
+	// a simple data is "mulTi_1341091260_1221024018"
 	allStrs := ws.Split(query.Data, sepChar)
 	// format is multipleTargetData + sepChar + m.getStrOwnerId() + sepChar + ssg.ToBase10(id)
 	if len(allStrs) < 3 {
@@ -564,7 +565,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container := multipleTargetsMap.Get(ownerId)
 	multipleTargetsMap.Delete(ownerId)
 	if container == nil {
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = container.myMessage.Delete(bot)
 		return nil
 	}
 

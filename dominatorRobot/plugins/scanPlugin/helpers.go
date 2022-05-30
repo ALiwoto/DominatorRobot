@@ -63,10 +63,6 @@ func _getMultipleTargetsMap() *ws.SafeEMap[int64, multipleTargetContainer] {
 		}
 
 		_, _ = value.myMessage.Delete(value.bot)
-
-		if value.originHandler != nil {
-			_ = value.originHandler(value.bot, value.ctx, false, true, 0)
-		}
 	})
 	m.EnableChecking()
 

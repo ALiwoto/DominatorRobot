@@ -165,7 +165,9 @@ func (a *anonContainer) getStrChatId() string {
 //---------------------------------------------------------
 
 func (i *inspectorContainer) ParseAsMd() mdparser.WMarkDown {
-	return mdparser.GetNormal("Preparing a cymatic scan request for the target user...")
+	md := mdparser.GetNormal("Preparing a cymatic scan request for the ")
+	md.Mention("target user", i.targetUser).Normal("...")
+	return md
 }
 
 func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {

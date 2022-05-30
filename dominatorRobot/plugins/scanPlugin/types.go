@@ -32,6 +32,7 @@ type inspectorContainer struct {
 	myMessage     *gotgbot.Message
 	ctx           *ext.Context
 	bot           *gotgbot.Bot
+	targetUser    int64
 	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
 }
 
