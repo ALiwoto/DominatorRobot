@@ -6,6 +6,7 @@ import (
 	"github.com/ALiwoto/mdparser/mdparser"
 	"github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	"github.com/AnimeKaizoku/ssg/ssg"
 	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 )
@@ -188,6 +189,46 @@ func (i *inspectorContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 
 func (i *inspectorContainer) getStrOwnerId() string {
 	return ws.ToBase10(i.ctx.EffectiveUser.Id)
+}
+
+//---------------------------------------------------------
+
+func (m *multipleTargetContainer) ParseAsMd() mdparser.WMarkDown {
+	md := mdparser.GetNormal("Dominator is being pointed at multiple targets.\n")
+	md.Normal(".\nPlease choose one of the following options")
+	return md
+}
+
+func (m *multipleTargetContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
+	markup := &gotgbot.InlineKeyboardMarkup{}
+	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, len(m.targetUsers))
+
+	var currentName string
+	var currentId int64
+	var currentUser *gotgbot.User
+	for i := 0; i < len(m.targetUsers); i++ {
+		currentUser = m.targetUsers[i]
+		currentId = currentUser.Id
+		currentName = currentUser.FirstName + currentUser.LastName
+		if len(currentName) > 16 {
+			currentName = currentName[:16]
+		}
+
+		markup.InlineKeyboard[i] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
+			Text:         currentName + " - " + ssg.ToBase10(currentId),
+			CallbackData: m.getButtonData(currentId),
+		})
+	}
+
+	return markup
+}
+
+func (m *multipleTargetContainer) getButtonData(id int64) string {
+	return multipleTargetData + sepChar + m.getStrOwnerId() + sepChar + ssg.ToBase10(id)
+}
+
+func (m *multipleTargetContainer) getStrOwnerId() string {
+	return ws.ToBase10(m.ctx.EffectiveUser.Id)
 }
 
 //---------------------------------------------------------

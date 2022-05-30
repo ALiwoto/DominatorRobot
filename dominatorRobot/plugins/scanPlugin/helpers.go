@@ -44,7 +44,28 @@ func _getInspectorsMap() *ws.SafeEMap[int64, inspectorContainer] {
 		_, _ = value.myMessage.Delete(value.bot)
 
 		if value.originHandler != nil {
-			_ = value.originHandler(value.bot, value.ctx, false, true)
+			_ = value.originHandler(value.bot, value.ctx, false, true, 0)
+		}
+	})
+	m.EnableChecking()
+
+	return m
+}
+
+func _getMultipleTargetsMap() *ws.SafeEMap[int64, multipleTargetContainer] {
+	m := ws.NewSafeEMap[int64, multipleTargetContainer]()
+
+	m.SetInterval(10 * time.Minute)
+	m.SetExpiration(15 * time.Minute)
+	m.SetOnExpired(func(key int64, value multipleTargetContainer) {
+		if value.myMessage == nil {
+			return
+		}
+
+		_, _ = value.myMessage.Delete(value.bot)
+
+		if value.originHandler != nil {
+			_ = value.originHandler(value.bot, value.ctx, false, true, 0)
 		}
 	})
 	m.EnableChecking()
@@ -60,6 +81,7 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	cancelAnonCb := handlers.NewCallback(cancelAnonCallBackQuery, cancelAnonResponse)
 	confirmAnonCb := handlers.NewCallback(confirmAnonCallBackQuery, confirmAnonResponse)
 	inspectorsCb := handlers.NewCallback(inspectorsCallBackQuery, inspectorsResponse)
+	multiTargetCb := handlers.NewCallback(multiTargetCallBackQuery, multiTargetPanelResponse)
 
 	scanCmd.Triggers = t
 	revertCmd.Triggers = t
@@ -67,6 +89,7 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	d.AddHandler(cancelAnonCb)
 	d.AddHandler(confirmAnonCb)
 	d.AddHandler(inspectorsCb)
+	d.AddHandler(multiTargetCb)
 	d.AddHandler(cancelScanCb)
 	d.AddHandler(finalScanCb)
 	d.AddHandler(scanCmd)

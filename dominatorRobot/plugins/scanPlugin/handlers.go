@@ -11,6 +11,7 @@ import (
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
+	"github.com/AnimeKaizoku/ssg/ssg"
 	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -18,10 +19,10 @@ import (
 
 // scanHandler is just a wrapper around coreScanHandler function.
 func scanHandler(b *gotgbot.Bot, ctx *ext.Context) error {
-	return coreScanHandler(b, ctx, false, false)
+	return coreScanHandler(b, ctx, false, false, 0)
 }
 
-func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool) error {
+func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error {
 	msg := ctx.EffectiveMessage
 	sender := ctx.EffectiveUser.Id
 	if msg.ReplyToMessage == nil || msg.ReplyToMessage.From == nil {
@@ -54,7 +55,11 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 	src := msg.GetLink()
 
 	replied := msg.ReplyToMessage
-	target := replied.From.Id
+	target := targetId
+	if target == 0 {
+		target = replied.From.Id
+	}
+	hasMultipleTarget := false
 	var targetType sibylSystemGo.EntityType
 
 	args, err := argparser.ParseArgDefault(msg.Text)
@@ -70,18 +75,36 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		reason = args.GetFirstNoneEmptyValue()
 	}
 
-	if original && replied.ForwardFrom != nil && replied.ForwardFrom.Id != 0 {
-		if replied.ForwardFrom.IsBot {
+	if targetId == 0 {
+		if replied.ForwardFrom != nil && replied.ForwardFrom.Id != 0 {
+			if original {
+				if replied.ForwardFrom.IsBot {
+					targetType = sibylSystemGo.EntityTypeBot
+				}
+				target = replied.ForwardFrom.Id
+			} else {
+				hasMultipleTarget = true
+			}
+
+		} else if replied.From.IsBot {
 			targetType = sibylSystemGo.EntityTypeBot
 		}
-		target = replied.ForwardFrom.Id
-	} else if replied.From.IsBot {
-		targetType = sibylSystemGo.EntityTypeBot
 	}
 
 	if target == b.Id {
 		// maybe add a message or a warning or a cool quote here? dunno
 		return ext.EndGroups
+	}
+
+	if hasMultipleTarget {
+		var targetUsers []*gotgbot.User
+		targetUsers = append(targetUsers, replied.From, replied.ForwardFrom)
+		container := &multipleTargetContainer{
+			ctx:           ctx,
+			bot:           b,
+			originHandler: coreScanHandler,
+		}
+		return sendMultipleTargetPanelHandler(b, container)
 	}
 
 	targetInfo, _ := wv.SibylClient.GetInfo(target)
@@ -168,6 +191,19 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
+	})
+
+	return ext.EndGroups
+}
+
+func sendMultipleTargetPanelHandler(b *gotgbot.Bot, container *multipleTargetContainer) error {
+	multipleTargetsMap.Add(container.ctx.EffectiveSender.Id(), container)
+	msg := container.ctx.EffectiveMessage
+	container.myMessage, _ = msg.Reply(b, container.ParseAsMd().ToString(), &gotgbot.SendMessageOpts{
+		ParseMode:                wv.MarkdownV2,
+		DisableWebPagePreview:    true,
+		AllowSendingWithoutReply: true,
+		ReplyMarkup:              container.GetButtons(),
 	})
 
 	return ext.EndGroups
@@ -307,6 +343,10 @@ func confirmAnonCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 
 func inspectorsCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, inspectorActionData+sepChar)
+}
+
+func multiTargetCallBackQuery(cq *gotgbot.CallbackQuery) bool {
+	return strings.HasPrefix(cq.Data, multipleTargetData+sepChar)
 }
 
 func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
@@ -464,13 +504,13 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
-		return coreScanHandler(bot, container.ctx, true, true)
+		return coreScanHandler(bot, container.ctx, true, true, 0)
 	case confirmData:
 		md := mdparser.GetMono("Cymatic scan request has been sent.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
-		return coreScanHandler(bot, container.ctx, false, true)
+		return coreScanHandler(bot, container.ctx, false, true, 0)
 	case cancelData:
 		md := mdparser.GetMono("Scan request has been canceled by user.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
@@ -483,6 +523,61 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		// anyway, too lazy to log this
 		return nil
 	}
+}
+
+func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
+	query := ctx.CallbackQuery
+	// a simple data is "mulTi_1341091260_1454547878"
+	allStrs := ws.Split(query.Data, sepChar)
+	// format is multipleTargetData + sepChar + m.getStrOwnerId() + sepChar + ssg.ToBase10(id)
+	if len(allStrs) < 3 {
+		return ext.EndGroups
+	}
+
+	ownerId, err := strconv.ParseInt(allStrs[1], 10, 64)
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	u := utils.ResolveUser(query.From.Id)
+	if !utils.CanScan(u) {
+		// user has lost the ability to scan.
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "This button is not for you...",
+			ShowAlert: true,
+			CacheTime: 5500,
+		})
+		_, _ = ctx.EffectiveMessage.Delete(bot)
+		return ext.EndGroups
+	}
+
+	if ownerId != query.From.Id {
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "This button is not for you...",
+			ShowAlert: true,
+			CacheTime: 5500,
+		})
+		return ext.EndGroups
+	}
+
+	container := multipleTargetsMap.Get(ownerId)
+	multipleTargetsMap.Delete(ownerId)
+	if container == nil {
+		_, _ = ctx.EffectiveMessage.Delete(bot)
+		return nil
+	}
+
+	// TODO: add support for "all", to multiple all of them at once.
+	targetId := ssg.ToInt64(allStrs[2])
+	if targetId == 0 {
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "Invalid 0 data specified in callback button... please try another option.",
+			ShowAlert: true,
+		})
+		return ext.EndGroups
+	}
+
+	return coreScanHandler(bot, container.ctx, false, false, targetId)
 }
 
 func finalScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {

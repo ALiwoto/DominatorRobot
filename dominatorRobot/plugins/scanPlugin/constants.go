@@ -14,6 +14,7 @@ const (
 	forceData           = "force"
 	confirmData         = "confirm"
 	inspectorActionData = "insAc"
+	multipleTargetData  = "mulTi"
 )
 
 const (

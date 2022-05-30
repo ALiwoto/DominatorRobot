@@ -10,8 +10,12 @@ var (
 	// anonsMap contains the pending issued command by an anon admin. the key used is
 	// the group id.
 	anonsMap = _getAnonsMap()
-	// inspectorsMap contains the
+	// inspectorsMap contains the pending issued command by an inspector. the key used is
+	// the user id.
 	inspectorsMap = _getInspectorsMap()
+	// multipleTargetsMap contains the pending issued command by an enforcer/inspector that
+	// has pointed to multiple targets. the key used is the user id.
+	multipleTargetsMap = _getMultipleTargetsMap()
 )
 
 var (
