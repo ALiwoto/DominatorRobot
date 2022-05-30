@@ -103,6 +103,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			ctx:           ctx,
 			bot:           b,
 			originHandler: coreScanHandler,
+			targetUsers:   targetUsers,
 		}
 		return sendMultipleTargetPanelHandler(b, container)
 	}
