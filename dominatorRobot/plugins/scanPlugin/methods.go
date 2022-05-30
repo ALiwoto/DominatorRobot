@@ -138,7 +138,7 @@ func (a *anonContainer) FastDeleteMessage() {
 }
 
 func (a *anonContainer) ParseAsMd() mdparser.WMarkDown {
-	md := mdparser.GetNormal("Seems like you are an anonymous user.\n")
+	md := mdparser.GetNormal("Seems like you are an anonymous admin.\n")
 	md.Normal("Please press the button below to confirm you are a valid user registered at PSB.")
 	return md
 }
@@ -195,9 +195,52 @@ func (i *inspectorContainer) getStrOwnerId() string {
 
 //---------------------------------------------------------
 
+func (u *TargetUserWrapper) GetLongMd() mdparser.WMarkDown {
+	theName := u.User.FirstName + u.User.LastName
+	id := u.User.Id
+	if len(theName) > 22 {
+		theName = theName[:22]
+	}
+	md := mdparser.GetEmpty()
+
+	switch u.UserType {
+	case wrappedUserTypeForwarder:
+		md.Bold("Forwarder in group:\n")
+	case wrappedUserTypeOriginalSender:
+		md.Bold("Original sender:\n")
+	}
+
+	return md.Bold("• ").Mention(theName, id).Normal(" - " + ssg.ToBase10(id))
+}
+
+func (u *TargetUserWrapper) GetButtonText() string {
+	switch u.UserType {
+	case wrappedUserTypeForwarder:
+		return "Forwarder in Group"
+	case wrappedUserTypeOriginalSender:
+		return "Original Sender"
+	default:
+		// by default, apply old logic in here, because sawada's
+		// design won't work in this special case (which is supposed to never
+		// happen).
+		currentId := u.User.Id
+		currentName := u.User.FirstName + u.User.LastName
+		if len(currentName) > 16 {
+			currentName = currentName[:16]
+		}
+
+		return currentName + " - " + ssg.ToBase10(currentId)
+	}
+}
+
+//---------------------------------------------------------
+
 func (m *multipleTargetContainer) ParseAsMd() mdparser.WMarkDown {
-	md := mdparser.GetNormal("Dominator is being pointed at multiple targets.\n")
-	md.Normal(".\nPlease choose one of the following options")
+	md := mdparser.GetBold("⚠️ Dominator has detected multiple targets!\n\n")
+
+	for _, current := range m.targetUsers {
+		md.AppendThis(current.GetLongMd().ElThis())
+	}
 	return md
 }
 
@@ -205,20 +248,10 @@ func (m *multipleTargetContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 	markup := &gotgbot.InlineKeyboardMarkup{}
 	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, len(m.targetUsers))
 
-	var currentName string
-	var currentId int64
-	var currentUser *gotgbot.User
 	for i := 0; i < len(m.targetUsers); i++ {
-		currentUser = m.targetUsers[i]
-		currentId = currentUser.Id
-		currentName = currentUser.FirstName + currentUser.LastName
-		if len(currentName) > 16 {
-			currentName = currentName[:16]
-		}
-
 		markup.InlineKeyboard[i] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
-			Text:         currentName + " - " + ssg.ToBase10(currentId),
-			CallbackData: m.getButtonData(currentId),
+			Text:         m.targetUsers[i].GetButtonText(),
+			CallbackData: m.getButtonData(m.targetUsers[i].User.Id),
 		})
 	}
 

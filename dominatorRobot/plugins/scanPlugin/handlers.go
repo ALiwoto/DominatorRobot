@@ -97,8 +97,16 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 	}
 
 	if hasMultipleTarget {
-		var targetUsers []*gotgbot.User
-		targetUsers = append(targetUsers, replied.From, replied.ForwardFrom)
+		targetUsers := []*TargetUserWrapper{
+			{
+				UserType: wrappedUserTypeForwarder,
+				User:     replied.From,
+			},
+			{
+				UserType: wrappedUserTypeOriginalSender,
+				User:     replied.ForwardFrom,
+			},
+		}
 		container := &multipleTargetContainer{
 			ctx:           ctx,
 			bot:           b,

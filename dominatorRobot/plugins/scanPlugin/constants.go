@@ -21,3 +21,8 @@ const (
 	anonRequestScan anonRequestType = iota + 1
 	anonRequestRevert
 )
+
+const (
+	wrappedUserTypeForwarder = iota + 1
+	wrappedUserTypeOriginalSender
+)

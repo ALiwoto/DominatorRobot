@@ -7,6 +7,7 @@ import (
 )
 
 type anonRequestType uint8
+type wrappedUserType uint8
 type coreHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
 
 type pendingScanData struct {
@@ -36,10 +37,15 @@ type inspectorContainer struct {
 	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
 }
 
+type TargetUserWrapper struct {
+	UserType wrappedUserType
+	User     *gotgbot.User
+}
+
 type multipleTargetContainer struct {
 	myMessage     *gotgbot.Message
 	ctx           *ext.Context
 	bot           *gotgbot.Bot
-	targetUsers   []*gotgbot.User
+	targetUsers   []*TargetUserWrapper
 	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
 }
