@@ -506,13 +506,13 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
-		return coreScanHandler(bot, container.ctx, true, true, 0)
+		return coreScanHandler(bot, container.ctx, true, true, container.targetUser)
 	case confirmData:
 		md := mdparser.GetMono("Cymatic scan request has been sent.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
-		return coreScanHandler(bot, container.ctx, false, true, 0)
+		return coreScanHandler(bot, container.ctx, false, true, container.targetUser)
 	case cancelData:
 		md := mdparser.GetMono("Scan request has been canceled by user.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
