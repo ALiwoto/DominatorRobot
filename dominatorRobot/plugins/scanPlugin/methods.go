@@ -242,7 +242,7 @@ func (m *multipleTargetContainer) ParseAsMd() mdparser.WMarkDown {
 		md.AppendThis(current.GetLongMd().ElThis())
 	}
 
-	return md.Normal("Select the person to scan:")
+	return md.Normal("\nSelect the person to scan:")
 }
 
 func (m *multipleTargetContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
