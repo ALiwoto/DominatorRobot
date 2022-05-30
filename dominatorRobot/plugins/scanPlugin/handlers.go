@@ -565,9 +565,11 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container := multipleTargetsMap.Get(ownerId)
 	multipleTargetsMap.Delete(ownerId)
 	if container == nil {
-		_, _ = container.myMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot)
 		return nil
 	}
+
+	container.FastDeleteMessage()
 
 	// TODO: add support for "all", to multiple all of them at once.
 	targetId := ssg.ToInt64(allStrs[2])

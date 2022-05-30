@@ -233,4 +233,11 @@ func (m *multipleTargetContainer) getStrOwnerId() string {
 	return ws.ToBase10(m.ctx.EffectiveUser.Id)
 }
 
+// FastDeleteMessage will delete the `myMessage` field of this anonContainer value;
+// it's called "fast", because it doesn't have any nil-check in it, you have to
+// check for that before even calling this method, otherwise you will get panic
+func (m *multipleTargetContainer) FastDeleteMessage() {
+	_, _ = m.myMessage.Delete(m.bot)
+}
+
 //---------------------------------------------------------
