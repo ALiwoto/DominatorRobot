@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	HelperBot   *gotgbot.Bot
-	BotUpdater  *ext.Updater
-	SibylClient sibyl.SibylClient
-	RateLimiter *ratelimiter.Limiter
+	HelperBot       *gotgbot.Bot
+	BotUpdater      *ext.Updater
+	SibylClient     sibyl.SibylClient
+	SibylDispatcher *sibyl.SibylDispatcher
+	RateLimiter     *ratelimiter.Limiter
 )

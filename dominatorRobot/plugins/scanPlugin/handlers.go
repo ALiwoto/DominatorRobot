@@ -7,7 +7,8 @@ import (
 
 	"github.com/ALiwoto/argparser/argparser"
 	"github.com/ALiwoto/mdparser/mdparser"
-	sibylSystemGo "github.com/ALiwoto/sibylSystemGo/sibylSystem"
+	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
+	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
@@ -60,7 +61,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		target = replied.From.Id
 	}
 	hasMultipleTarget := false
-	var targetType sibylSystemGo.EntityType
+	var targetType sibyl.EntityType
 
 	args, err := argparser.ParseArgDefault(msg.Text)
 	if err != nil {
@@ -79,7 +80,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		if replied.ForwardFrom != nil && replied.ForwardFrom.Id != 0 {
 			if original {
 				if replied.ForwardFrom.IsBot {
-					targetType = sibylSystemGo.EntityTypeBot
+					targetType = sibyl.EntityTypeBot
 				}
 				target = replied.ForwardFrom.Id
 			} else {
@@ -87,7 +88,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			}
 
 		} else if replied.From.IsBot {
-			targetType = sibylSystemGo.EntityTypeBot
+			targetType = sibyl.EntityTypeBot
 		}
 	}
 
@@ -118,17 +119,17 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 
 	targetInfo, _ := wv.SibylClient.GetInfo(target)
 	if targetInfo != nil && targetInfo.Banned {
-		var banConfig *sibylSystemGo.BanConfig
-		var reportConfig *sibylSystemGo.ReportConfig
+		var banConfig *sibyl.BanConfig
+		var reportConfig *sibyl.ReportConfig
 		if force {
-			banConfig = &sibylSystemGo.BanConfig{
+			banConfig = &sibyl.BanConfig{
 				Message:    replied.Text,
 				SrcUrl:     src,
 				TargetType: targetType,
 				TheToken:   u.Hash,
 			}
 		} else {
-			reportConfig = &sibylSystemGo.ReportConfig{
+			reportConfig = &sibyl.ReportConfig{
 				Message:    replied.Text,
 				SrcUrl:     src,
 				TargetType: targetType,
@@ -150,7 +151,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 	}
 
 	if force {
-		_, err = wv.SibylClient.Ban(target, reason, &sibylSystemGo.BanConfig{
+		_, err = wv.SibylClient.Ban(target, reason, &sibyl.BanConfig{
 			Message:    replied.Text,
 			SrcUrl:     src,
 			TargetType: targetType,
@@ -166,7 +167,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			}
 			return sendInspectorScanPanelHandler(b, container)
 		} else {
-			_, err = wv.SibylClient.Report(target, reason, &sibylSystemGo.ReportConfig{
+			_, err = wv.SibylClient.Report(target, reason, &sibyl.ReportConfig{
 				Message:    replied.Text,
 				SrcUrl:     src,
 				TargetType: targetType,
@@ -414,7 +415,7 @@ func cancelAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	anonsMap.Delete(chatId)
-	_, _ = ctx.EffectiveMessage.Delete(bot)
+	_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 
 	return ext.EndGroups
 }
@@ -441,7 +442,7 @@ func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container := anonsMap.Get(chatId)
 	anonsMap.Delete(chatId)
 	if container == nil {
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 		return nil
 	}
 
@@ -487,7 +488,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 		return ext.EndGroups
 	}
 
@@ -503,7 +504,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container := inspectorsMap.Get(ownerId)
 	inspectorsMap.Delete(ownerId)
 	if container == nil {
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 		return nil
 	}
 
@@ -557,7 +558,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 		return ext.EndGroups
 	}
 
@@ -573,7 +574,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container := multipleTargetsMap.Get(ownerId)
 	multipleTargetsMap.Delete(ownerId)
 	if container == nil {
-		_, _ = ctx.EffectiveMessage.Delete(bot)
+		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
 		return nil
 	}
 
@@ -639,6 +640,18 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		ParseMode: wv.MarkdownV2,
 	})
 	return ext.EndGroups
+}
+
+//---------------------------------------------------------
+
+func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateContext) error {
+	logging.Debug("got approved event")
+	return nil
+}
+
+func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateContext) error {
+	logging.Debug("got rejected event")
+	return nil
 }
 
 //---------------------------------------------------------

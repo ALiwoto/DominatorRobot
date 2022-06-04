@@ -41,7 +41,7 @@ func GetTokenFromServer(id int64) *sibyl.TokenInfo {
 
 func SendAlert(b *gotgbot.Bot, m *gotgbot.Message, md mdparser.WMarkDown) error {
 	str := md.ToString()
-	str = strings.ReplaceAll(str, b.Token, "")
+	str = strings.ReplaceAll(str, b.GetToken(), "")
 	_, err := m.Reply(b, str, &gotgbot.SendMessageOpts{ParseMode: MarkDownV2})
 	if err != nil {
 		log.Println(err)

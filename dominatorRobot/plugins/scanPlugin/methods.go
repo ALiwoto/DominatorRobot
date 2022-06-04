@@ -64,7 +64,7 @@ func (d *pendingScanData) GetButtons() *gotgbot.InlineKeyboardMarkup {
 
 func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
 	md := mdparser.GetEmpty()
-	byUser, err := d.bot.GetChat(d.targetInfo.BannedBy)
+	byUser, err := d.bot.GetChat(d.targetInfo.BannedBy, nil)
 	if err != nil {
 		return md
 	}
@@ -90,7 +90,7 @@ func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
 func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 	md := mdparser.GetNormal("Target user is currently banned in Sibyl System ")
 	md.Normal("with the following details:")
-	user, err := d.bot.GetChat(d.Target)
+	user, err := d.bot.GetChat(d.Target, nil)
 	if err != nil {
 		/* most likely impossible */
 		user = &gotgbot.Chat{
@@ -126,7 +126,7 @@ func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 
 func (a *anonContainer) DeleteMessage() {
 	if a != nil && a.myMessage != nil {
-		_, _ = a.myMessage.Delete(a.bot)
+		_, _ = a.myMessage.Delete(a.bot, nil)
 	}
 }
 
@@ -134,7 +134,7 @@ func (a *anonContainer) DeleteMessage() {
 // it's called "fast", because it doesn't have any nil-check in it, you have to
 // check for that before even calling this method, otherwise you will get panic
 func (a *anonContainer) FastDeleteMessage() {
-	_, _ = a.myMessage.Delete(a.bot)
+	_, _ = a.myMessage.Delete(a.bot, nil)
 }
 
 func (a *anonContainer) ParseAsMd() mdparser.WMarkDown {
@@ -271,7 +271,7 @@ func (m *multipleTargetContainer) getStrOwnerId() string {
 // it's called "fast", because it doesn't have any nil-check in it, you have to
 // check for that before even calling this method, otherwise you will get panic
 func (m *multipleTargetContainer) FastDeleteMessage() {
-	_, _ = m.myMessage.Delete(m.bot)
+	_, _ = m.myMessage.Delete(m.bot, nil)
 }
 
 //---------------------------------------------------------

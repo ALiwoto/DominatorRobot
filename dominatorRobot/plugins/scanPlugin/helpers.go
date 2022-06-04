@@ -3,6 +3,7 @@ package scanPlugin
 import (
 	"time"
 
+	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
@@ -41,7 +42,7 @@ func _getInspectorsMap() *ws.SafeEMap[int64, inspectorContainer] {
 			return
 		}
 
-		_, _ = value.myMessage.Delete(value.bot)
+		_, _ = value.myMessage.Delete(value.bot, nil)
 
 		if value.originHandler != nil {
 			_ = value.originHandler(value.bot, value.ctx, false, true, 0)
@@ -62,7 +63,7 @@ func _getMultipleTargetsMap() *ws.SafeEMap[int64, multipleTargetContainer] {
 			return
 		}
 
-		_, _ = value.myMessage.Delete(value.bot)
+		_, _ = value.myMessage.Delete(value.bot, nil)
 	})
 	m.EnableChecking()
 
@@ -90,4 +91,9 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	d.AddHandler(finalScanCb)
 	d.AddHandler(scanCmd)
 	d.AddHandler(revertCmd)
+}
+
+func LoadAllSibylHandlers(d *sibyl.SibylDispatcher) {
+	d.AddHandler(sibyl.UpdateTypeScanRequestApproved, sibylScanApprovedHandler)
+	d.AddHandler(sibyl.UpdateTypeScanRequestRejected, sibylScanRejectedHandler)
 }

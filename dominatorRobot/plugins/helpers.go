@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
@@ -20,9 +21,10 @@ func StartTelegramBot() error {
 	}
 
 	b, err := gotgbot.NewBot(token, &gotgbot.BotOpts{
-		Client:      http.Client{},
-		GetTimeout:  gotgbot.DefaultGetTimeout,
-		PostTimeout: gotgbot.DefaultPostTimeout,
+		Client: http.Client{},
+		DefaultRequestOpts: &gotgbot.RequestOpts{
+			Timeout: 3 * gotgbot.DefaultTimeout,
+		},
 	})
 	if err != nil {
 		return err
@@ -56,6 +58,9 @@ func StartTelegramBot() error {
 		return errors.New("sibyl token doesn't have owner permissions")
 	}
 
+	wv.SibylDispatcher = sibylSystem.GetNewDispatcher(wv.SibylClient)
+
+	LoadAllSibylHandlers(wv.SibylDispatcher)
 	LoadAllHandlers(updater.Dispatcher, wotoConfig.GetCmdPrefixes())
 
 	updater.Idle()
