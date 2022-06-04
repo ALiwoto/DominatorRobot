@@ -63,6 +63,7 @@ func StartTelegramBot() error {
 	LoadAllSibylHandlers(wv.SibylDispatcher)
 	LoadAllHandlers(updater.Dispatcher, wotoConfig.GetCmdPrefixes())
 
+	wv.SibylDispatcher.Listen()
 	updater.Idle()
 	return nil
 }
