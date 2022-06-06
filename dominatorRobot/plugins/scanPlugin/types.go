@@ -41,7 +41,7 @@ type inspectorContainer struct {
 	ctx           *ext.Context
 	bot           *gotgbot.Bot
 	targetUser    int64
-	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
+	originHandler coreHandler
 }
 
 type TargetUserWrapper struct {
@@ -54,5 +54,5 @@ type multipleTargetContainer struct {
 	ctx           *ext.Context
 	bot           *gotgbot.Bot
 	targetUsers   []*TargetUserWrapper
-	originHandler func(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect bool, targetId int64) error
+	originHandler coreHandler
 }

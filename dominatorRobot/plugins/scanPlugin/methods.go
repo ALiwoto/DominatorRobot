@@ -6,7 +6,6 @@ import (
 	"github.com/ALiwoto/mdparser/mdparser"
 	"github.com/ALiwoto/sibylSystemGo/sibylSystem"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
-	"github.com/AnimeKaizoku/ssg/ssg"
 	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 )
@@ -210,7 +209,7 @@ func (u *TargetUserWrapper) GetLongMd() mdparser.WMarkDown {
 		md.Bold("Original sender:\n")
 	}
 
-	return md.Bold("• ").Mention(theName, id).Normal(" - " + ssg.ToBase10(id))
+	return md.Bold("• ").Mention(theName, id).Normal(" - " + ws.ToBase10(id))
 }
 
 func (u *TargetUserWrapper) GetButtonText() string {
@@ -229,7 +228,7 @@ func (u *TargetUserWrapper) GetButtonText() string {
 			currentName = currentName[:16]
 		}
 
-		return currentName + " - " + ssg.ToBase10(currentId)
+		return currentName + " - " + ws.ToBase10(currentId)
 	}
 }
 
@@ -260,7 +259,7 @@ func (m *multipleTargetContainer) GetButtons() *gotgbot.InlineKeyboardMarkup {
 }
 
 func (m *multipleTargetContainer) getButtonData(id int64) string {
-	return multipleTargetData + sepChar + m.getStrOwnerId() + sepChar + ssg.ToBase10(id)
+	return multipleTargetData + sepChar + m.getStrOwnerId() + sepChar + ws.ToBase10(id)
 }
 
 func (m *multipleTargetContainer) getStrOwnerId() string {

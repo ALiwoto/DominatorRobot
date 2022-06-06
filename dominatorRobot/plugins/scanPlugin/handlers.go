@@ -11,7 +11,6 @@ import (
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
-	"github.com/AnimeKaizoku/ssg/ssg"
 	ws "github.com/AnimeKaizoku/ssg/ssg"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -591,7 +590,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	container.FastDeleteMessage()
 
 	// TODO: add support for "all", to multiple all of them at once.
-	targetId := ssg.ToInt64(allStrs[2])
+	targetId := ws.ToInt64(allStrs[2])
 	if targetId == 0 {
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
 			Text:      "Invalid 0 data specified in callback button... please try another option.",
@@ -673,16 +672,19 @@ func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 }
 
 func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateContext) error {
-	approvedData := ctx.ScanRequestRejected
-	data := scanDataMap.Get(approvedData.UniqueId)
+	rejectedData := ctx.ScanRequestRejected
+	data := scanDataMap.Get(rejectedData.UniqueId)
 	if data == nil {
 		// this scan is not sent by us.
 		return nil
 	}
-	scanDataMap.Delete(approvedData.UniqueId)
+	scanDataMap.Delete(rejectedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Your scan request has been rejected by NONA tower.")
+	md := mdparser.GetMono("Your scan request has been rejected.")
+	if rejectedData.AgentReason != "" {
+		md.Bold("\nReason: ").Mono(rejectedData.AgentReason)
+	}
 	_, _ = msg.Reply(data.bot, md.ToString(), &gotgbot.SendMessageOpts{
 		ParseMode:             wv.MarkdownV2,
 		DisableWebPagePreview: true,
