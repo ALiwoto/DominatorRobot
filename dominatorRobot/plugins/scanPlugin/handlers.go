@@ -8,7 +8,6 @@ import (
 	"github.com/ALiwoto/argparser/argparser"
 	"github.com/ALiwoto/mdparser/mdparser"
 	sibyl "github.com/ALiwoto/sibylSystemGo/sibylSystem"
-	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/logging"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
@@ -71,6 +70,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 	force := forceScan || args.HasFlag("f", "force", "force-ban")
 	reason := args.GetAsStringOrRaw("r", "reason", "reason")
 	original := args.HasFlag("o", "original", "origin")
+	noPanel := args.HasFlag("no-panel", "noPanel")
 
 	if reason == "" {
 		reason = args.GetFirstNoneEmptyValue()
@@ -97,7 +97,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		return ext.EndGroups
 	}
 
-	if hasMultipleTarget {
+	if hasMultipleTarget && !noPanel {
 		targetUsers := []*TargetUserWrapper{
 			{
 				UserType: wrappedUserTypeForwarder,
@@ -150,6 +150,8 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		return showAlreadyBannedHandler(b, pending)
 	}
 
+	var scanUniqueId string
+
 	if force {
 		_, err = wv.SibylClient.Ban(target, reason, &sibyl.BanConfig{
 			Message:    replied.Text,
@@ -158,7 +160,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			TheToken:   u.Hash,
 		})
 	} else {
-		if u.Permission.CanBan() && !noRedirect {
+		if u.Permission.CanBan() && !noRedirect && !noPanel {
 			container := &inspectorContainer{
 				ctx:           ctx,
 				bot:           b,
@@ -167,12 +169,20 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 			}
 			return sendInspectorScanPanelHandler(b, container)
 		} else {
-			_, err = wv.SibylClient.Report(target, reason, &sibyl.ReportConfig{
+			scanUniqueId, err = wv.SibylClient.Report(target, reason, &sibyl.ReportConfig{
 				Message:    replied.Text,
 				SrcUrl:     src,
 				TargetType: targetType,
 				TheToken:   u.Hash,
 			})
+			if scanUniqueId != "" {
+				scanDataMap.Add(scanUniqueId, &ScanDataContainer{
+					ctx:      ctx,
+					bot:      b,
+					UniqueId: scanUniqueId,
+					OwnerId:  sender,
+				})
+			}
 		}
 	}
 
@@ -645,12 +655,38 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 //---------------------------------------------------------
 
 func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateContext) error {
-	logging.Debug("got approved event")
+	approvedData := ctx.ScanRequestApproved
+	data := scanDataMap.Get(approvedData.UniqueId)
+	if data == nil {
+		// this scan is not sent by us.
+		return nil
+	}
+	scanDataMap.Delete(approvedData.UniqueId)
+
+	msg := data.ctx.EffectiveMessage
+	md := mdparser.GetMono("Your scan request has been approved by NONA tower.")
+	_, _ = msg.Reply(data.bot, md.ToString(), &gotgbot.SendMessageOpts{
+		ParseMode:             wv.MarkdownV2,
+		DisableWebPagePreview: true,
+	})
 	return nil
 }
 
 func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateContext) error {
-	logging.Debug("got rejected event")
+	approvedData := ctx.ScanRequestRejected
+	data := scanDataMap.Get(approvedData.UniqueId)
+	if data == nil {
+		// this scan is not sent by us.
+		return nil
+	}
+	scanDataMap.Delete(approvedData.UniqueId)
+
+	msg := data.ctx.EffectiveMessage
+	md := mdparser.GetMono("Your scan request has been rejected by NONA tower.")
+	_, _ = msg.Reply(data.bot, md.ToString(), &gotgbot.SendMessageOpts{
+		ParseMode:             wv.MarkdownV2,
+		DisableWebPagePreview: true,
+	})
 	return nil
 }
 

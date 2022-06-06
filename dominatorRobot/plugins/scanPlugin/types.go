@@ -22,6 +22,13 @@ type pendingScanData struct {
 	reportConfig *sibylSystemGo.ReportConfig
 }
 
+type ScanDataContainer struct {
+	ctx      *ext.Context
+	bot      *gotgbot.Bot
+	UniqueId string
+	OwnerId  int64
+}
+
 type anonContainer struct {
 	myMessage *gotgbot.Message
 	ctx       *ext.Context
