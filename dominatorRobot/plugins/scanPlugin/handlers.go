@@ -664,6 +664,9 @@ func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 
 	msg := data.ctx.EffectiveMessage
 	md := mdparser.GetMono("Your scan request has been approved by NONA tower.")
+	if approvedData.AgentReason != "" {
+		md.Bold("\nApproved reason: ").Mono(approvedData.AgentReason)
+	}
 	_, _ = msg.Reply(data.bot, md.ToString(), &gotgbot.SendMessageOpts{
 		ParseMode:             wv.MarkdownV2,
 		DisableWebPagePreview: true,
