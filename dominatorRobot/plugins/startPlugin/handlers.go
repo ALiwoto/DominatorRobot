@@ -6,6 +6,7 @@ import (
 
 	"github.com/ALiwoto/mdparser/mdparser"
 	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/utils"
+	"github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoConfig"
 	wv "github.com/AnimeKaizoku/DominatorRobot/dominatorRobot/core/wotoValues"
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -31,7 +32,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	wv.RateLimiter.AddCustomIgnore(sender, time.Minute*5, false)
 	defer wv.RateLimiter.RemoveCustomIgnore(sender)
 
-	//"TS No: `{userid}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
+	//"TS No: `{userId}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
 	md := mdparser.GetNormal("Dominator Portable Psychological Diagnosis")
 	md.AppendNormalThis(" and Supression System has been activated!")
 	topMsg, err := message.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
@@ -43,7 +44,7 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 	time.Sleep(sleepTime)
 
-	//"TS No: `{userid}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
+	//"TS No: `{userId}-48`\nARDR: `005-001`\n\nInitializing\n ▯ ▯ ▯ ▯"
 	md = mdparser.GetNormal("TS No: ").AppendMonoThis(strconv.FormatInt(sender, 10))
 	md.AppendNormalThis("\nARDR: ").AppendMonoThis("005-001")
 	prototype := md.El()
@@ -108,4 +109,31 @@ func dHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	return ext.EndGroups
+}
+
+func chatMemberFilter(u *gotgbot.ChatMemberUpdated) bool {
+	return u.NewChatMember.GetUser().Id == wv.HelperBot.Id
+}
+
+func chatMemberResponse(b *gotgbot.Bot, ctx *ext.Context) error {
+	chatMember := ctx.MyChatMember.NewChatMember
+	chat := ctx.EffectiveChat
+	if chatMember == nil {
+		return nil
+	}
+
+	status := chatMember.GetStatus()
+	// if status isn't equal to "member", it means there has been some other
+	// operations being done on the group (such as a new admin being promoted or
+	// something, idk).
+	if status != "member" {
+		return ext.EndGroups
+	}
+
+	botAddedMessage := wotoConfig.GetBotAddedMessage()
+	if botAddedMessage != nil {
+		_, _ = botAddedMessage.Copy(b, chat.Id, nil)
+	}
+
+	return nil
 }
