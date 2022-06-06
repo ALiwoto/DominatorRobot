@@ -663,7 +663,7 @@ func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(approvedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Your scan request has been approved by NONA tower.")
+	md := mdparser.GetMono("Cymatic scan request has been approved by NONA tower.")
 	if approvedData.AgentReason != "" {
 		md.Bold("\nApproved reason: ").Mono(approvedData.AgentReason)
 	}
@@ -684,7 +684,7 @@ func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(rejectedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Your scan request has been rejected.")
+	md := mdparser.GetMono("Cymatic scan request has been rejected.")
 	if rejectedData.AgentReason != "" {
 		md.Bold("\nReason: ").Mono(rejectedData.AgentReason)
 	}
