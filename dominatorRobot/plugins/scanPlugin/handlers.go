@@ -133,6 +133,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 				SrcUrl:     src,
 				TargetType: targetType,
 				TheToken:   u.Hash,
+				PollingId:  wv.SibylDispatcher.PollingId,
 			}
 		}
 
@@ -173,6 +174,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 				SrcUrl:     src,
 				TargetType: targetType,
 				TheToken:   u.Hash,
+				PollingId:  wv.SibylDispatcher.PollingId,
 			})
 			if scanUniqueId != "" {
 				scanDataMap.Add(scanUniqueId, &ScanDataContainer{
