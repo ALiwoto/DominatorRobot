@@ -198,7 +198,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 		return ext.EndGroups
 	}
 
-	md := mdparser.GetNormal("Sending a cymatic scan request to Sibyl...")
+	md := mdparser.GetNormal("An on-demand Cymatic scan request sent!")
 	topMsg, err := ctx.EffectiveMessage.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
 		AllowSendingWithoutReply: false,
 		ParseMode:                wv.MarkdownV2,
@@ -209,7 +209,7 @@ func coreScanHandler(b *gotgbot.Bot, ctx *ext.Context, forceScan, noRedirect boo
 
 	time.Sleep(time.Millisecond * 600)
 
-	md = mdparser.GetMono("Sibyl request has been sent.")
+	md = mdparser.GetMono("Scan request sent.")
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
@@ -340,7 +340,7 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md = mdparser.GetMono("Sibyl request has been sent.")
+	md = mdparser.GetMono("Scan request has been sent.")
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
@@ -387,7 +387,7 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 	if ownerId != query.From.Id {
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -400,7 +400,7 @@ func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md := mdparser.GetMono("Sibyl request canceled by user.")
+	md := mdparser.GetMono("Scan request cancelled by user.")
 	_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
@@ -495,7 +495,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	if !utils.CanScan(u) {
 		// user has lost the ability to scan.
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -505,7 +505,7 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 	if ownerId != query.From.Id {
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -522,19 +522,19 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	data := allStrs[1]
 	switch data {
 	case forceData:
-		md := mdparser.GetMono("Force scan request has been sent.")
+		md := mdparser.GetMono("Enforcement action forced!")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
 		return coreScanHandler(bot, container.ctx, true, true, container.targetUser)
 	case confirmData:
-		md := mdparser.GetMono("Cymatic scan request has been sent.")
+		md := mdparser.GetMono("Cymatic scan requested for user.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
 		return coreScanHandler(bot, container.ctx, false, true, container.targetUser)
 	case cancelData:
-		md := mdparser.GetMono("Scan request has been canceled by user.")
+		md := mdparser.GetMono("Scan request cancelled.")
 		_, _, _ = ctx.EffectiveMessage.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
@@ -565,7 +565,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	if !utils.CanScan(u) {
 		// user has lost the ability to scan.
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -575,7 +575,7 @@ func multiTargetPanelResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 	if ownerId != query.From.Id {
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -624,7 +624,7 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 
 	if ownerId != query.From.Id {
 		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "This button is not for you...",
+			Text:      "Unauthorized user!",
 			ShowAlert: true,
 			CacheTime: 5500,
 		})
@@ -639,14 +639,14 @@ func finalScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	}
 
 	if err != nil {
-		md := mdparser.GetMono("Sibyl request failed: ").Mono(err.Error())
+		md := mdparser.GetMono("Scan request failed: ").Mono(err.Error())
 		_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
 		return ext.EndGroups
 	}
 
-	md := mdparser.GetMono("Sibyl request has been sent.")
+	md := mdparser.GetMono("Scan request has been sent.")
 	_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
 	})
@@ -665,7 +665,7 @@ func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(approvedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Cymatic scan request has been approved by NONA tower.")
+	md := mdparser.GetMono("Crime coefficient over $$$, user is a target for enforcement action!\nEnforcement mode: Lethal Eliminator")
 	if approvedData.AgentReason != "" {
 		md.Bold("\nApproved reason: ").Mono(approvedData.AgentReason)
 	}
@@ -686,7 +686,7 @@ func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(rejectedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Cymatic scan request has been rejected.")
+	md := mdparser.GetMono("Crime Coefficient is under $$$.\nNot a target for enforcement action.\nTrigger of dominator will be locked!")
 	if rejectedData.AgentReason != "" {
 		md.Bold("\nReason: ").Mono(rejectedData.AgentReason)
 	}

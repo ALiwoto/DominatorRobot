@@ -85,7 +85,7 @@ func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
 	md.Normal("[").Mono(ws.ToBase10(byUser.Id)).Normal("]")
 	return md
 }
-
+/* This text here on line 90, it needs to be updated, reach out to me and i'll give you a template for this, adding this comment so we dont forget. */
 func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
 	md := mdparser.GetNormal("Target user is currently banned in Sibyl System ")
 	md.Normal("with the following details:")
@@ -137,8 +137,8 @@ func (a *anonContainer) FastDeleteMessage() {
 }
 
 func (a *anonContainer) ParseAsMd() mdparser.WMarkDown {
-	md := mdparser.GetNormal("Seems like you are an anonymous admin.\n")
-	md.Normal("Please press the button below to confirm you are a valid user registered at PSB.")
+	md := mdparser.GetNormal("Anomyous admin detected!.\n")
+	md.Normal("Press the button below to confirm your dominator authorisation.")
 	return md
 }
 
