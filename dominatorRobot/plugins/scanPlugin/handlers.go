@@ -668,7 +668,10 @@ func sibylScanApprovedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(approvedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Crime coefficient over $$$, user is a target for enforcement action!\nEnforcement mode: Lethal Eliminator")
+	md := mdparser.GetNormal("Crime coefficient ").Bold("over 300, ")
+	md.Normal("user is a target for enforcement action!\n")
+	md.Bold("Enforcement mode: ").Normal("Lethal Eliminator")
+	// md2 := mdparser.GetMono("Crime coefficient over $$$, user is a target for enforcement action!\nEnforcement mode: Lethal Eliminator")
 	if approvedData.AgentReason != "" {
 		md.Bold("\nApproved reason: ").Mono(approvedData.AgentReason)
 	}
@@ -689,7 +692,10 @@ func sibylScanRejectedHandler(client sibyl.SibylClient, ctx *sibyl.SibylUpdateCo
 	scanDataMap.Delete(rejectedData.UniqueId)
 
 	msg := data.ctx.EffectiveMessage
-	md := mdparser.GetMono("Crime Coefficient is under $$$.\nNot a target for enforcement action.\nTrigger of dominator will be locked!")
+	md := mdparser.GetNormal("Crime Coefficient is under 100.\n")
+	md.Normal("Not a target for enforcement action.\n")
+	md.Normal("Trigger of dominator will be locked!")
+	// md := mdparser.GetMono("Crime Coefficient is under $$$.\nNot a target for enforcement action.\nTrigger of dominator will be locked!")
 	if rejectedData.AgentReason != "" {
 		md.Bold("\nReason: ").Mono(rejectedData.AgentReason)
 	}
