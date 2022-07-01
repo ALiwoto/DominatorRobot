@@ -291,8 +291,8 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		})
 	}
 
-	u := utils.ResolveUser(sender)
-	if !utils.CanScan(u) {
+	requesterToken := utils.ResolveUser(sender)
+	if !utils.CanScan(requesterToken) {
 		return ext.EndGroups
 	}
 
@@ -318,7 +318,10 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		}
 	}
 
-	_, err = wv.SibylClient.RemoveBan(target)
+	_, err = wv.SibylClient.RemoveBan(target, "", &sibyl.RevertConfig{
+		TheToken: requesterToken.Hash,
+		SrcUrl:   msg.GetLink(),
+	})
 	if err != nil {
 		_ = utils.SendAlertErr(b, msg, err)
 		return ext.EndGroups
