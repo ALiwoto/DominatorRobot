@@ -48,14 +48,14 @@ func (d *pendingScanData) GeneratedUniqueId() string {
 
 func (d *pendingScanData) GetButtons() *gotgbot.InlineKeyboardMarkup {
 	markup := &gotgbot.InlineKeyboardMarkup{}
-	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 2)
+	markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 1)
+	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
+		Text:         "✖️",
+		CallbackData: cancelData + sepChar + d.getStrOwnerId() + sepChar + d.UniqueId,
+	})
 	markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
 		Text:         "Scan",
 		CallbackData: pendingData + sepChar + d.getStrOwnerId() + sepChar + d.UniqueId,
-	})
-	markup.InlineKeyboard[1] = append(markup.InlineKeyboard[1], gotgbot.InlineKeyboardButton{
-		Text:         "cancel",
-		CallbackData: cancelData + sepChar + d.getStrOwnerId() + sepChar + d.UniqueId,
 	})
 
 	return markup
@@ -85,10 +85,10 @@ func (d *pendingScanData) getOperatorMd() mdparser.WMarkDown {
 	md.Normal("[").Mono(ws.ToBase10(byUser.Id)).Normal("]")
 	return md
 }
+
 /* This text here on line 90, it needs to be updated, reach out to me and i'll give you a template for this, adding this comment so we dont forget. */
 func (d *pendingScanData) ParseAsMd() mdparser.WMarkDown {
-	md := mdparser.GetNormal("Target user is currently banned in Sibyl System ")
-	md.Normal("with the following details:")
+	md := mdparser.GetNormal("Target user is currently banned in Sibyl")
 	user, err := d.bot.GetChat(d.Target, nil)
 	if err != nil {
 		/* most likely impossible */
@@ -235,7 +235,7 @@ func (u *TargetUserWrapper) GetButtonText() string {
 //---------------------------------------------------------
 
 func (m *multipleTargetContainer) ParseAsMd() mdparser.WMarkDown {
-	md := mdparser.GetBold("⚠️ Dominator has detected multiple targets!\n\n")
+	md := mdparser.GetBold("⚠️ Multiple targets detected!\n\n")
 
 	for _, current := range m.targetUsers {
 		md.AppendThis(current.GetLongMd().ElThis())
