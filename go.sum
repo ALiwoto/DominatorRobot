@@ -2,8 +2,8 @@ github.com/ALiwoto/argparser v1.0.5 h1:pm/MY+eTsK+gJ57fFuB+4iqbTiKItNY8IMQWisJBg
 github.com/ALiwoto/argparser v1.0.5/go.mod h1:6YYb1QT47ADy2hmu4BokpMH01VQYVCiZ/FF9dC4oMRA=
 github.com/ALiwoto/mdparser v1.1.2 h1:weZU4pGIqJBwYrmJX9ncQIUrTcAxSSB0pexGUtXJcZI=
 github.com/ALiwoto/mdparser v1.1.2/go.mod h1:YL/F0SIvpRgP5iTip4t3qXdwg4X0OZCS/+dHKbdAgWc=
-github.com/ALiwoto/sibylSystemGo v1.0.13 h1:dDkMzlY+NqR7kUglXHcyNIE6VhNvVWzYDVtfxx4wRhQ=
-github.com/ALiwoto/sibylSystemGo v1.0.13/go.mod h1:+C6CM/S5YSsnIe/Z9wWYDtFBHh2o0K/z5pu8qFo234Q=
+github.com/ALiwoto/sibylSystemGo v1.0.14 h1:rfiAEzGCK6fHEtKsOrRx70UEcE2tGM9kSbL36efg4Ao=
+github.com/ALiwoto/sibylSystemGo v1.0.14/go.mod h1:+C6CM/S5YSsnIe/Z9wWYDtFBHh2o0K/z5pu8qFo234Q=
 github.com/AnimeKaizoku/ssg v1.1.20 h1:NKwPgksVTwpT/uyhOcggDC88UxB4pkkhrClnOrn4sKE=
 github.com/AnimeKaizoku/ssg v1.1.20/go.mod h1:pe9BzQLW45VHgs4Puq1WcvnY+G5r07ecg2+MIycC1OM=
 github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.6/go.mod h1:r815fYWTudnU9JhtsJAxUtuV7QrSgKpChJkfTSMFpfg=
