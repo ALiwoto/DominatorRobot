@@ -368,7 +368,7 @@ func fullRevertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return sendAnonMessageHandler(b, &anonContainer{
 			bot:     b,
 			ctx:     ctx,
-			request: anonRequestRevert,
+			request: anonRequestFullRevert,
 		})
 	}
 
@@ -399,9 +399,8 @@ func fullRevertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		}
 	}
 
-	_, err = wv.SibylClient.RemoveBan(target, "", &sibyl.RevertConfig{
+	_, err = wv.SibylClient.FullRevert(target, &sibyl.FullRevertConfig{
 		TheToken: requesterToken.Hash,
-		SrcUrl:   msg.GetLink(),
 	})
 	if err != nil {
 		_ = utils.SendAlertErr(b, msg, err)
@@ -424,7 +423,7 @@ func fullRevertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
-	md = mdparser.GetMono("Scan request has been sent.")
+	md = mdparser.GetMono("Full revert request has been sent.")
 
 	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
 		ParseMode: wv.MarkdownV2,
