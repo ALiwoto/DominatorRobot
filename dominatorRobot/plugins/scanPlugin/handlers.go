@@ -512,6 +512,7 @@ func fullRevertBtnResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
 			ParseMode: wv.MarkdownV2,
 		})
+		return ext.EndGroups
 	}
 
 	md := mdparser.GetMono("Full revert request sent.")
