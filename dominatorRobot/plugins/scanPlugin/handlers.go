@@ -352,6 +352,87 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 	return ext.EndGroups
 }
 
+func fullRevertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
+	msg := ctx.EffectiveMessage
+	sender := ctx.EffectiveUser.Id
+
+	// check for anon admin
+	if sender == 1087968824 {
+		if !wotoConfig.SupportAnon() {
+			return ext.EndGroups
+		}
+
+		// delete the old message (this method is nil-safe)
+		anonsMap.Get(msg.Chat.Id).DeleteMessage()
+
+		return sendAnonMessageHandler(b, &anonContainer{
+			bot:     b,
+			ctx:     ctx,
+			request: anonRequestRevert,
+		})
+	}
+
+	requesterToken := utils.ResolveUser(sender)
+	if !utils.CanScan(requesterToken) {
+		return ext.EndGroups
+	}
+
+	replied := msg.ReplyToMessage
+	var target int64
+
+	args, err := argparser.ParseArgDefault(msg.Text)
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	targetUser, ok := args.GetAsIntegerOrRaw("u", "id", "target", "user")
+	original := args.HasFlag("o", "original", "origin")
+	if ok {
+		target = targetUser
+	}
+
+	if target == 0 && replied != nil && replied.From != nil && replied.From.Id != 0 {
+		if original && replied.ForwardFrom != nil && replied.ForwardFrom.Id != 0 {
+			target = replied.ForwardFrom.Id
+		} else {
+			target = replied.From.Id
+		}
+	}
+
+	_, err = wv.SibylClient.RemoveBan(target, "", &sibyl.RevertConfig{
+		TheToken: requesterToken.Hash,
+		SrcUrl:   msg.GetLink(),
+	})
+	if err != nil {
+		_ = utils.SendAlertErr(b, msg, err)
+		return ext.EndGroups
+	}
+
+	md := mdparser.GetNormal("Sending a cymatic scan request to Sibyl...")
+	topMsg, err := ctx.EffectiveMessage.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
+		AllowSendingWithoutReply: false,
+		ParseMode:                wv.MarkdownV2,
+	})
+	if err != nil {
+		return ext.EndGroups
+	}
+
+	time.Sleep(time.Millisecond * 600)
+
+	if err != nil {
+		_ = utils.SendAlertErr(b, msg, err)
+		return ext.EndGroups
+	}
+
+	md = mdparser.GetMono("Scan request has been sent.")
+
+	_, _, _ = topMsg.EditText(b, md.ToString(), &gotgbot.EditMessageTextOpts{
+		ParseMode: wv.MarkdownV2,
+	})
+
+	return ext.EndGroups
+}
+
 //---------------------------------------------------------
 
 func cancelScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {
@@ -471,7 +552,8 @@ func confirmAnonResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return scanHandler(bot, container.ctx)
 	case anonRequestRevert:
 		return revertHandler(bot, container.ctx)
-
+	case anonRequestFullRevert:
+		return fullRevertHandler(bot, container.ctx)
 	default:
 		// hm? unknown request type, sounds like not implemented or something
 		// like that

@@ -73,6 +73,7 @@ func _getMultipleTargetsMap() *ws.SafeEMap[int64, multipleTargetContainer] {
 func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	scanCmd := handlers.NewCommand(ScanCmd, scanHandler)
 	revertCmd := handlers.NewCommand(RevertCmd, revertHandler)
+	fullRevertCmd := handlers.NewCommand(FullRevertCmd, fullRevertHandler)
 	cancelScanCb := handlers.NewCallback(cancelScanCallBackQuery, cancelScanResponse)
 	finalScanCb := handlers.NewCallback(finalScanCallBackQuery, finalScanResponse)
 	cancelAnonCb := handlers.NewCallback(cancelAnonCallBackQuery, cancelAnonResponse)
@@ -82,6 +83,7 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 
 	scanCmd.Triggers = t
 	revertCmd.Triggers = t
+	fullRevertCmd.Triggers = t
 
 	d.AddHandler(cancelAnonCb)
 	d.AddHandler(confirmAnonCb)
@@ -91,6 +93,7 @@ func LoadAllHandlers(d *ext.Dispatcher, t []rune) {
 	d.AddHandler(finalScanCb)
 	d.AddHandler(scanCmd)
 	d.AddHandler(revertCmd)
+	d.AddHandler(fullRevertCmd)
 }
 
 func LoadAllSibylHandlers(d *sibyl.SibylDispatcher) {

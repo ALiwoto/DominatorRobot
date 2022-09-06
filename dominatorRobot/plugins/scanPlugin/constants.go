@@ -1,8 +1,9 @@
 package scanPlugin
 
 const (
-	ScanCmd   = "scan"
-	RevertCmd = "revert"
+	ScanCmd       = "scan"
+	RevertCmd     = "revert"
+	FullRevertCmd = "fullRevert"
 )
 
 const (
@@ -20,6 +21,7 @@ const (
 const (
 	anonRequestScan anonRequestType = iota + 1
 	anonRequestRevert
+	anonRequestFullRevert
 )
 
 const (
