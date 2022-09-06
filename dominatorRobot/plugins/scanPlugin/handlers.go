@@ -323,6 +323,28 @@ func revertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 		SrcUrl:   msg.GetLink(),
 	})
 	if err != nil {
+		if sibylError := sibyl.ToSibylError(err); sibylError != nil {
+			if strings.Contains(sibylError.Message, "not banned") {
+				md := mdparser.GetNormal(sibylError.Error())
+				markup := &gotgbot.InlineKeyboardMarkup{}
+				markup.InlineKeyboard = make([][]gotgbot.InlineKeyboardButton, 1)
+
+				// format is fRe_targetId_ownerId
+				cbData := fullRevertBtnData + sepChar + ws.ToBase10(target) + sepChar + ws.ToBase10(sender)
+				markup.InlineKeyboard[0] = append(markup.InlineKeyboard[0], gotgbot.InlineKeyboardButton{
+					Text:         "Full revert",
+					CallbackData: cbData,
+				})
+				_, _ = msg.Reply(b, md.ToString(), &gotgbot.SendMessageOpts{
+					ParseMode:             wv.MarkdownV2,
+					DisableWebPagePreview: true,
+					ReplyMarkup:           markup,
+				})
+
+				return ext.EndGroups
+			}
+		}
+
 		_ = utils.SendAlertErr(b, msg, err)
 		return ext.EndGroups
 	}
@@ -434,6 +456,10 @@ func fullRevertHandler(b *gotgbot.Bot, ctx *ext.Context) error {
 
 //---------------------------------------------------------
 
+func fullRevertCallBackQuery(cq *gotgbot.CallbackQuery) bool {
+	return strings.HasPrefix(cq.Data, fullRevertBtnData+sepChar)
+}
+
 func cancelScanCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, cancelData+sepChar)
 }
@@ -452,6 +478,48 @@ func inspectorsCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 
 func multiTargetCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, multipleTargetData+sepChar)
+}
+
+func fullRevertBtnResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
+	query := ctx.CallbackQuery
+	allStrs := ws.Split(query.Data, sepChar)
+	msg := query.Message
+	// format is fRe_targetId_ownerId
+	if len(allStrs) < 3 {
+		return ext.EndGroups
+	}
+
+	ownerId := ws.ToInt64(allStrs[2])
+	if ownerId != query.From.Id {
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "This button is not for you!",
+			ShowAlert: true,
+			CacheTime: 5800,
+		})
+	}
+
+	target := ws.ToInt64(allStrs[1])
+	requesterToken := utils.ResolveUser(ownerId)
+	if !utils.CanScan(requesterToken) {
+		return ext.EndGroups
+	}
+
+	_, err := wv.SibylClient.FullRevert(target, &sibyl.FullRevertConfig{
+		TheToken: requesterToken.Hash,
+	})
+	if err != nil {
+		md := mdparser.GetNormal(err.Error())
+		_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
+			ParseMode: wv.MarkdownV2,
+		})
+	}
+
+	md := mdparser.GetMono("Full revert request sent.")
+	_, _, _ = msg.EditText(bot, md.ToString(), &gotgbot.EditMessageTextOpts{
+		ParseMode: wv.MarkdownV2,
+	})
+
+	return ext.EndGroups
 }
 
 func cancelScanResponse(bot *gotgbot.Bot, ctx *ext.Context) error {

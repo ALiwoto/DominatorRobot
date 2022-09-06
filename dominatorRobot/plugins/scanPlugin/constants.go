@@ -16,6 +16,7 @@ const (
 	confirmData         = "confirm"
 	inspectorActionData = "insAc"
 	multipleTargetData  = "mulTi"
+	fullRevertBtnData   = "fRe"
 )
 
 const (
