@@ -54,10 +54,10 @@ func SendAlertErr(b *gotgbot.Bot, m *gotgbot.Message, e error) error {
 	if e == nil {
 		return nil
 	}
-	md := mdparser.GetItalic("Sibyl System says: \n")
-	md = md.AppendNormal(e.Error())
+	// md := mdparser.GetItalic("Sibyl System says: \n")
+	// md = md.AppendNormal(e.Error())
 
-	return SendAlert(b, m, md)
+	return SendAlert(b, m, mdparser.GetNormal(e.Error()))
 }
 
 func SafeReply(b *gotgbot.Bot, ctx *ext.Context, output string) error {
