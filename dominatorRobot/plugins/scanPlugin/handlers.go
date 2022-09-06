@@ -480,6 +480,9 @@ func multiTargetCallBackQuery(cq *gotgbot.CallbackQuery) bool {
 	return strings.HasPrefix(cq.Data, multipleTargetData+sepChar)
 }
 
+// fullRevertBtnResponse function is the response handler for "full revert"
+// button displayed on the error message when /revert command used on someone who
+// is "not banned" (or rather, they are in `Restored` range).
 func fullRevertBtnResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 	query := ctx.CallbackQuery
 	allStrs := ws.Split(query.Data, sepChar)
