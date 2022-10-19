@@ -647,6 +647,15 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 
+	if ownerId != query.From.Id {
+		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
+			Text:      "Unauthorized user!",
+			ShowAlert: true,
+			CacheTime: 5500,
+		})
+		return ext.EndGroups
+	}
+
 	u := utils.ResolveUser(query.From.Id)
 	if !utils.CanScan(u) {
 		// user has lost the ability to scan.
@@ -656,15 +665,6 @@ func inspectorsResponse(bot *gotgbot.Bot, ctx *ext.Context) error {
 			CacheTime: 5500,
 		})
 		_, _ = ctx.EffectiveMessage.Delete(bot, nil)
-		return ext.EndGroups
-	}
-
-	if ownerId != query.From.Id {
-		_, _ = query.Answer(bot, &gotgbot.AnswerCallbackQueryOpts{
-			Text:      "Unauthorized user!",
-			ShowAlert: true,
-			CacheTime: 5500,
-		})
 		return ext.EndGroups
 	}
 
